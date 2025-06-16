@@ -6,6 +6,7 @@
 #include <SFML/Network.hpp>
 #include <SFML/Audio.hpp>
 #include <Windows.h>
+#include <dwmapi.h>
 #include <thread>
 #include <vector>
 #include <ctime>
@@ -15,9 +16,15 @@ using namespace std;
 
 #define SCREEN_RESX 1280
 #define SCREEN_RESY 720
+#define MAP_SIZEX 3500
+#define MAP_SIZEY 3000
 #define OBJECT_SIZE 30
-#define MIN_NUM_OF_OBJECTS 60
-#define MAX_NUM_OF_OBJECTS 200
+#define MIN_NUM_OF_OBJECTS 200
+#define MAX_NUM_OF_OBJECTS 500
+#define STEP 5
+#define SPEED 12   // < 10 - Faster; > 10 - Slower
+
+extern int game_status;
 
 class Object {
 public:
@@ -36,6 +43,7 @@ extern RectangleShape GrassShape;
 extern RectangleShape RockShape;
 extern RectangleShape StumpShape;
 extern RectangleShape BushShape;
+extern RectangleShape Player;
 
 //FUNCTIONS
 

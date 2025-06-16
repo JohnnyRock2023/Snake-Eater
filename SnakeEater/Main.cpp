@@ -1,23 +1,73 @@
 #include "Header.h"
 
+int game_status = 1;
+
 // Objects
 vector<Object> objects;
 RectangleShape GrassShape;
 RectangleShape RockShape;
 RectangleShape StumpShape;
 RectangleShape BushShape;
-RectangleShape Shape1;
+RectangleShape Player;
+
+float playerPosX = (MAP_SIZEX / 2) - (OBJECT_SIZE / 2);
+float playerPosY = (MAP_SIZEY / 2) - (OBJECT_SIZE / 2);
+float viewPosX = (MAP_SIZEX / 2);
+float viewPosY = (MAP_SIZEY / 2);
 
 void renderingThread(RenderWindow* window)
 {
     srand(time(NULL));
+    View view({ viewPosX, viewPosY }, {SCREEN_RESX, SCREEN_RESY});
+    window->setView(view);
     window->setActive(true);
     setObjectsPos();
+    Clock clock;
+    float timer = 0;
 
     while (window->isOpen())
     {
+        if (game_status == 1) {
+            float time = clock.getElapsedTime().asMilliseconds();
+            clock.restart();
+            timer += time;
+
+            if (timer > SPEED) {
+                timer = 0;
+
+                // Потом переделать
+                if (Keyboard::isKeyPressed(Keyboard::Key::W) && playerPosY > 0) {
+                    if (viewPosY - (SCREEN_RESY / 2) > 0 && playerPosY + (OBJECT_SIZE / 2) == viewPosY) {
+                        viewPosY -= STEP;
+                    }
+                    playerPosY -= STEP;
+                }
+                else if (Keyboard::isKeyPressed(Keyboard::Key::S) && playerPosY < MAP_SIZEY - OBJECT_SIZE) {
+                    if (viewPosY + (SCREEN_RESY / 2) < MAP_SIZEY && playerPosY + (OBJECT_SIZE/2) == viewPosY) {
+                        viewPosY += STEP;
+                    }
+                    playerPosY += STEP;
+                }
+                if (Keyboard::isKeyPressed(Keyboard::Key::A) && playerPosX > 0) {
+                    if (viewPosX - (SCREEN_RESX / 2) > 0 && playerPosX + (OBJECT_SIZE / 2) == viewPosX) {
+                        viewPosX -= STEP;
+                    }
+                    playerPosX -= STEP;
+                }
+                else if (Keyboard::isKeyPressed(Keyboard::Key::D) && playerPosX < MAP_SIZEX - OBJECT_SIZE) {
+                    if (viewPosX + (SCREEN_RESX / 2) < MAP_SIZEX && playerPosX + (OBJECT_SIZE / 2) == viewPosX) {
+                        viewPosX += STEP;
+                    }
+                    playerPosX += STEP;
+                }
+                Player.setPosition({playerPosX, playerPosY});
+                view.setCenter({ viewPosX, viewPosY });
+                window->setView(view);
+            }
+        }
         window->clear(Color::Green);
         fillTheMapWithObj(window);
+        window->draw(Player);
         window->display();
     }
 }
@@ -26,9 +76,15 @@ void renderingThread(RenderWindow* window)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
     ContextSettings settings;
     settings.antiAliasingLevel = 8;
+
     RenderWindow window(VideoMode({ SCREEN_RESX, SCREEN_RESY }), "Snake Eater", State::Windowed, settings);
+
     window.setActive(false);
-    thread thread(&renderingThread, &window);
+    window.setFramerateLimit(75);
+    Image logo;
+    logo.loadFromFile("SnakeLogo.png");
+    window.setIcon(logo);
+
 
     GrassShape.setFillColor(Color(34, 148, 106, 255));
     GrassShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
@@ -38,6 +94,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     StumpShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
     BushShape.setFillColor(Color(237, 204, 32, 255));
     BushShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
+    Player.setFillColor(Color(255, 255, 255, 255));
+    Player.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
+    Player.setPosition({playerPosX, playerPosY});
+
+    thread thread(&renderingThread, &window);
 
     while (window.isOpen())
     {

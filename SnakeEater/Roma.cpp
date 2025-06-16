@@ -6,11 +6,11 @@ void setObjectsPos() {
 	int type;
 	for (int i = 0; i < (MIN_NUM_OF_OBJECTS + rand() % MAX_NUM_OF_OBJECTS); i++) {
 		type = rand() % 4;
-		posX = (float)(rand() % (SCREEN_RESX / OBJECT_SIZE)) * OBJECT_SIZE;
-		posY = (float)(rand() % (SCREEN_RESY / OBJECT_SIZE)) * OBJECT_SIZE;
+		posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
+		posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
 		
 		for (int j = 0; j < objects.size(); j++) {
-			if (Vector2f(posX, posY) == objects[j].pos) {
+			if (posX == objects[j].pos.x && posY == objects[j].pos.y) {
 				i--;
 				continue;
 			}

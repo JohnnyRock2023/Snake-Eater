@@ -1,37 +1,43 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Network.hpp>
-#include <SFML/Audio.hpp>
-#include <thread>
-#include <Windows.h>
 #include "Header.h"
-using namespace sf;
-using namespace std;
 
+// Objects
+vector<Object> objects;
+RectangleShape GrassShape;
+RectangleShape RockShape;
+RectangleShape StumpShape;
+RectangleShape BushShape;
+RectangleShape Shape1;
 
 void renderingThread(RenderWindow* window)
 {
+    srand(time(NULL));
     window->setActive(true);
-    CircleShape shape(200.f, 60);
-    shape.setFillColor(Color::Cyan);
-    shape.setPosition({ 200, 200 });
+    setObjectsPos();
 
-    // the rendering loop
     while (window->isOpen())
     {
-        window->clear(Color::Blue);
-        window->draw(shape);
+        window->clear(Color::Green);
+        fillTheMapWithObj(window);
         window->display();
     }
 }
 
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
     ContextSettings settings;
     settings.antiAliasingLevel = 8;
-    RenderWindow window(VideoMode({ 800, 800 }), "Snake Eater", State::Windowed, settings);
+    RenderWindow window(VideoMode({ SCREEN_RESX, SCREEN_RESY }), "Snake Eater", State::Windowed, settings);
     window.setActive(false);
     thread thread(&renderingThread, &window);
+
+    GrassShape.setFillColor(Color(34, 148, 106, 255));
+    GrassShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
+    RockShape.setFillColor(Color(204, 6, 5, 255));
+    RockShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
+    StumpShape.setFillColor(Color(20, 89, 201, 255));
+    StumpShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
+    BushShape.setFillColor(Color(237, 204, 32, 255));
+    BushShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
 
     while (window.isOpen())
     {

@@ -6,7 +6,6 @@
 #include <SFML/Network.hpp>
 #include <SFML/Audio.hpp>
 #include <Windows.h>
-#include <dwmapi.h>
 #include <thread>
 #include <vector>
 #include <ctime>
@@ -34,7 +33,7 @@ public:
 	Object(int type, float posX, float posY)
 	{
 		this->type = type;
-		this->pos = Vector2f(posX, posY);
+		this->pos = {posX, posY};
 	}
 };
 

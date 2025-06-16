@@ -36,25 +36,25 @@ void renderingThread(RenderWindow* window)
                 timer = 0;
 
                 // Потом переделать
-                if (Keyboard::isKeyPressed(Keyboard::Key::W) && playerPosY > 0) {
+                if ((Keyboard::isKeyPressed(Keyboard::Key::W) || Keyboard::isKeyPressed(Keyboard::Key::Up)) && playerPosY > 0) {
                     if (viewPosY - (SCREEN_RESY / 2) > 0 && playerPosY + (OBJECT_SIZE / 2) == viewPosY) {
                         viewPosY -= STEP;
                     }
                     playerPosY -= STEP;
                 }
-                else if (Keyboard::isKeyPressed(Keyboard::Key::S) && playerPosY < MAP_SIZEY - OBJECT_SIZE) {
+                else if ((Keyboard::isKeyPressed(Keyboard::Key::S) || Keyboard::isKeyPressed(Keyboard::Key::Down)) && playerPosY < MAP_SIZEY - OBJECT_SIZE) {
                     if (viewPosY + (SCREEN_RESY / 2) < MAP_SIZEY && playerPosY + (OBJECT_SIZE/2) == viewPosY) {
                         viewPosY += STEP;
                     }
                     playerPosY += STEP;
                 }
-                if (Keyboard::isKeyPressed(Keyboard::Key::A) && playerPosX > 0) {
+                if ((Keyboard::isKeyPressed(Keyboard::Key::A) || Keyboard::isKeyPressed(Keyboard::Key::Left)) && playerPosX > 0) {
                     if (viewPosX - (SCREEN_RESX / 2) > 0 && playerPosX + (OBJECT_SIZE / 2) == viewPosX) {
                         viewPosX -= STEP;
                     }
                     playerPosX -= STEP;
                 }
-                else if (Keyboard::isKeyPressed(Keyboard::Key::D) && playerPosX < MAP_SIZEX - OBJECT_SIZE) {
+                else if ((Keyboard::isKeyPressed(Keyboard::Key::D) || Keyboard::isKeyPressed(Keyboard::Key::Right)) && playerPosX < MAP_SIZEX - OBJECT_SIZE) {
                     if (viewPosX + (SCREEN_RESX / 2) < MAP_SIZEX && playerPosX + (OBJECT_SIZE / 2) == viewPosX) {
                         viewPosX += STEP;
                     }

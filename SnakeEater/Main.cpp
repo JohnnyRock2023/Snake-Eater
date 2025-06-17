@@ -35,27 +35,26 @@ void renderingThread(RenderWindow* window)
             if (timer > SPEED) {
                 timer = 0;
 
-                // Потом переделать
                 if ((Keyboard::isKeyPressed(Keyboard::Key::W) || Keyboard::isKeyPressed(Keyboard::Key::Up)) && playerPosY > 0) {
-                    if (viewPosY - (SCREEN_RESY / 2) > 0 && playerPosY + (OBJECT_SIZE / 2) == viewPosY) {
+                    if (viewPosY - (SCREEN_RESY / 2) > 0 && playerPosY + (PLAYER_SIZEY / 2) == viewPosY) {
                         viewPosY -= STEP;
                     }
                     playerPosY -= STEP;
                 }
-                else if ((Keyboard::isKeyPressed(Keyboard::Key::S) || Keyboard::isKeyPressed(Keyboard::Key::Down)) && playerPosY < MAP_SIZEY - OBJECT_SIZE) {
-                    if (viewPosY + (SCREEN_RESY / 2) < MAP_SIZEY && playerPosY + (OBJECT_SIZE/2) == viewPosY) {
+                else if ((Keyboard::isKeyPressed(Keyboard::Key::S) || Keyboard::isKeyPressed(Keyboard::Key::Down)) && playerPosY < MAP_SIZEY - PLAYER_SIZEY) {
+                    if (viewPosY + (SCREEN_RESY / 2) < MAP_SIZEY && playerPosY + (PLAYER_SIZEY / 2) == viewPosY) {
                         viewPosY += STEP;
                     }
                     playerPosY += STEP;
                 }
                 if ((Keyboard::isKeyPressed(Keyboard::Key::A) || Keyboard::isKeyPressed(Keyboard::Key::Left)) && playerPosX > 0) {
-                    if (viewPosX - (SCREEN_RESX / 2) > 0 && playerPosX + (OBJECT_SIZE / 2) == viewPosX) {
+                    if (viewPosX - (SCREEN_RESX / 2) > 0 && playerPosX + (PLAYER_SIZEX / 2) == viewPosX) {
                         viewPosX -= STEP;
                     }
                     playerPosX -= STEP;
                 }
-                else if ((Keyboard::isKeyPressed(Keyboard::Key::D) || Keyboard::isKeyPressed(Keyboard::Key::Right)) && playerPosX < MAP_SIZEX - OBJECT_SIZE) {
-                    if (viewPosX + (SCREEN_RESX / 2) < MAP_SIZEX && playerPosX + (OBJECT_SIZE / 2) == viewPosX) {
+                else if ((Keyboard::isKeyPressed(Keyboard::Key::D) || Keyboard::isKeyPressed(Keyboard::Key::Right)) && playerPosX < MAP_SIZEX - PLAYER_SIZEX) {
+                    if (viewPosX + (SCREEN_RESX / 2) < MAP_SIZEX && playerPosX + (PLAYER_SIZEX / 2) == viewPosX) {
                         viewPosX += STEP;
                     }
                     playerPosX += STEP;
@@ -80,7 +79,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     RenderWindow window(VideoMode({ SCREEN_RESX, SCREEN_RESY }), "Snake Eater", State::Windowed, settings);
 
     window.setActive(false);
-    window.setFramerateLimit(75);
+    window.setFramerateLimit(120);
     Image logo;
     logo.loadFromFile("SnakeLogo.png");
     window.setIcon(logo);
@@ -95,7 +94,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     BushShape.setFillColor(Color(237, 204, 32, 255));
     BushShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
     Player.setFillColor(Color(255, 255, 255, 255));
-    Player.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
+    Player.setSize(Vector2f(PLAYER_SIZEX, PLAYER_SIZEY));
     Player.setPosition({playerPosX, playerPosY});
 
     thread thread(&renderingThread, &window);

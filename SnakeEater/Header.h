@@ -15,9 +15,11 @@ using namespace std;
 
 #define SCREEN_RESX 1280
 #define SCREEN_RESY 720
-#define MAP_SIZEX 3500
-#define MAP_SIZEY 3000
+#define MAP_SIZEX 2500
+#define MAP_SIZEY 2000
 #define OBJECT_SIZE 30
+#define PLAYER_SIZEX 30
+#define PLAYER_SIZEY 50
 #define MIN_NUM_OF_OBJECTS 200
 #define MAX_NUM_OF_OBJECTS 500
 #define STEP 5
@@ -26,14 +28,21 @@ using namespace std;
 extern int game_status;
 
 class Object {
-public:
-    unsigned short int type;
+private:
+    short int type;
     Vector2f pos;
 
+public:
 	Object(int type, float posX, float posY)
 	{
 		this->type = type;
 		this->pos = {posX, posY};
+	};
+	int getType() {
+		return type;
+	}
+	Vector2f getPos() {
+		return pos;
 	}
 };
 

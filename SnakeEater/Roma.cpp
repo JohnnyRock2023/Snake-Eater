@@ -10,7 +10,7 @@ void setObjectsPos() {
 		posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
 		
 		for (int j = 0; j < objects.size(); j++) {
-			if (posX == objects[j].pos.x && posY == objects[j].pos.y) {
+			if (posX == objects[j].getPos().x && posY == objects[j].getPos().y) {
 				i--;
 				continue;
 			}
@@ -21,20 +21,20 @@ void setObjectsPos() {
 
 void fillTheMapWithObj(RenderWindow *window) {
 	for (int i = 0; i < objects.size(); i++) {
-		if (objects[i].type == 0) {
-			GrassShape.setPosition(objects[i].pos);
+		if (objects[i].getType() == 0) {
+			GrassShape.setPosition(objects[i].getPos());
 			window->draw(GrassShape);
 		}
-		else if (objects[i].type == 1) {
-			RockShape.setPosition(objects[i].pos);
+		else if (objects[i].getType() == 1) {
+			RockShape.setPosition(objects[i].getPos());
 			window->draw(RockShape);
 		}
-		else if (objects[i].type == 2) {
-			StumpShape.setPosition(objects[i].pos);
+		else if (objects[i].getType() == 2) {
+			StumpShape.setPosition(objects[i].getPos());
 			window->draw(StumpShape);
 		}
-		else if (objects[i].type == 3) {
-			BushShape.setPosition(objects[i].pos);
+		else if (objects[i].getType() == 3) {
+			BushShape.setPosition(objects[i].getPos());
 			window->draw(BushShape);
 		}
 	}

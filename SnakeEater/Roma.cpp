@@ -125,7 +125,7 @@ void moveSnakes() {
 					}
 					break;
 				case 1:
-					if (snakes[i].getDirect() == 0 || snakes[i].getDirect() == 1 || posY + OBJECT_SIZE >= MAP_SIZEY) {
+					if (snakes[i].getDirect() == 0 || snakes[i].getDirect() == 1 || posY + OBJECT_SIZE > MAP_SIZEY) {
 						j--;
 					}
 					break;
@@ -135,7 +135,7 @@ void moveSnakes() {
 					}
 					break;
 				case 3:
-					if (snakes[i].getDirect() == 2 || snakes[i].getDirect() == 3 || posX + OBJECT_SIZE >= MAP_SIZEX) {
+					if (snakes[i].getDirect() == 2 || snakes[i].getDirect() == 3 || posX + OBJECT_SIZE > MAP_SIZEX) {
 						j--;
 					}
 					break;
@@ -147,7 +147,7 @@ void moveSnakes() {
 				}
 				break;
 			case 1:
-				if (snakes[i].getDirect() == 0 || posY + OBJECT_SIZE >= MAP_SIZEY) {
+				if (snakes[i].getDirect() == 0 || posY + OBJECT_SIZE > MAP_SIZEY) {
 					j--;
 				}
 				break;
@@ -157,7 +157,7 @@ void moveSnakes() {
 				}
 				break;
 			case 3:
-				if (snakes[i].getDirect() == 2 || posX + OBJECT_SIZE >= MAP_SIZEX) {
+				if (snakes[i].getDirect() == 2 || posX + OBJECT_SIZE > MAP_SIZEX) {
 					j--;
 				}
 				break;

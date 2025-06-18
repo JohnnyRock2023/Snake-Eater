@@ -5,11 +5,14 @@ int game_status = 1;
 
 // Objects
 vector<Object> objects;
+vector<Snake> snakes;
 RectangleShape GrassShape;
 RectangleShape RockShape;
 RectangleShape StumpShape;
 RectangleShape BushShape;
 RectangleShape Player;
+RectangleShape SnakeBodyShape;
+RectangleShape SnakeHeadShape;
 
 float playerPosX = (MAP_SIZEX / 2) - (OBJECT_SIZE / 2);
 float playerPosY = (MAP_SIZEY / 2) - (OBJECT_SIZE / 2);
@@ -23,8 +26,11 @@ void renderingThread(RenderWindow* window)
     window->setView(view);
     window->setActive(true);
     setObjectsPos();
+    spawnSnakes(10);
     Clock clock;
+    Clock snakeClock;
     float timer = 0;
+    float snakeTimer = 0;
 
     while (window->isOpen())
     {
@@ -32,6 +38,9 @@ void renderingThread(RenderWindow* window)
             float time = clock.getElapsedTime().asMilliseconds();
             clock.restart();
             timer += time;
+            float snakeTime = snakeClock.getElapsedTime().asMilliseconds();
+            snakeClock.restart();
+            snakeTimer += snakeTime;
 
             if (timer > SPEED) {
                 timer = 0;
@@ -64,10 +73,17 @@ void renderingThread(RenderWindow* window)
                 view.setCenter({ viewPosX, viewPosY });
                 window->setView(view);
             }
+
+            if (snakeTimer > SNAKE_SPEED) {
+                snakeTimer = 0;
+                moveSnakes();
+            }
         }
         window->clear(Color::Green);
         fillTheMapWithObj(window);
-        window->draw(Player);
+        drawSnakes(window);
+        window->setTitle(to_string(snakes.size()));
+        window->draw(Player); 
         window->display();
     }
 }
@@ -97,9 +113,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Player.setFillColor(Color(255, 255, 255, 255));
     Player.setSize(Vector2f(PLAYER_SIZEX, PLAYER_SIZEY));
     Player.setPosition({playerPosX, playerPosY});
+    SnakeBodyShape.setFillColor(Color(0, 0, 0, 255));
+    SnakeBodyShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
+    SnakeHeadShape.setFillColor(Color(107, 50, 168, 255));
+    SnakeHeadShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
 
     thread thread(&renderingThread, &window);
-
+    
     while (window.isOpen())
     {
        while (const optional event = window.pollEvent())

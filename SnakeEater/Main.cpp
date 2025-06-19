@@ -1,26 +1,32 @@
 #include "Header.h"
-//hg
 
 int game_status = 1;
 
 // Objects
 vector<Object> objects;
 vector<Snake> snakes;
-RectangleShape GrassShape;
-RectangleShape RockShape;
-RectangleShape StumpShape;
-RectangleShape BushShape;
-RectangleShape Player;
-RectangleShape SnakeBodyShape;
-RectangleShape SnakeHeadShape;
-RectangleShape SnakeTailShape;
 
 Texture PlayerFrontTexture;
+Texture PlayerBackTexture;
+Texture PlayerLeftTexture;
+Texture PlayerRightTexture;
 Texture SnakeBodyTexture;
 Texture SnakeBodyBendTexture;
 Texture SnakeHeadTexture;
 Texture SnakeTailTexture;
+Texture RockTexture;
+Texture GrassTexture;
+Texture StumpTexture;
+Texture BushTexture;
 
+Sprite* GrassSprite = nullptr;
+Sprite* RockSprite = nullptr;
+Sprite* StumpSprite = nullptr;
+Sprite* BushSprite = nullptr;
+Sprite* PlayerSprite = nullptr;
+Sprite* SnakeBodySprite = nullptr;
+Sprite* SnakeHeadSprite = nullptr;
+Sprite* SnakeTailSprite = nullptr;
 
 float playerPosX = (MAP_SIZEX / 2) - (PLAYER_SIZEX / 2);
 float playerPosY = (MAP_SIZEY / 2) - (PLAYER_SIZEY / 2);
@@ -31,7 +37,7 @@ float viewPosY = (MAP_SIZEY / 2);
 void renderingThread(RenderWindow* window)
 {
     srand(time(NULL));
-    View view({ viewPosX, viewPosY }, {SCREEN_RESX, SCREEN_RESY});
+    View view({ viewPosX, viewPosY }, { SCREEN_RESX, SCREEN_RESY });
     window->setView(view);
     window->setActive(true);
     setObjectsPos();
@@ -82,8 +88,18 @@ void renderingThread(RenderWindow* window)
                     playerPosX += STEP;
                     playerDirection = 3;
                 }
-                Player.setPosition({playerPosX, playerPosY});
-                //view.setCenter({ viewPosX, viewPosY });
+                PlayerSprite->setPosition({ playerPosX, playerPosY });
+                switch (playerDirection) {
+                case 0:
+                    PlayerSprite->setTexture(PlayerBackTexture, false); break;
+                case 1:
+                    PlayerSprite->setTexture(PlayerFrontTexture, false); break;
+                case 2:
+                    PlayerSprite->setTexture(PlayerLeftTexture, false); break;
+                case 3:
+                    PlayerSprite->setTexture(PlayerRightTexture, false); break;
+                }
+                view.setCenter({ viewPosX, viewPosY });
                 window->setView(view);
             }
 
@@ -92,12 +108,11 @@ void renderingThread(RenderWindow* window)
                 moveSnakes();
             }
         }
-        handleZoom(view);
         window->clear(Color::Green);
         fillTheMapWithObj(window);
         drawSnakes(window);
-        window->setTitle(to_string(snakes.size()));
-        window->draw(Player); 
+        handleZoom(view);
+        window->draw(*PlayerSprite);
         window->display();
     }
 }
@@ -116,46 +131,40 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     window.setIcon(logo);
 
     if (!PlayerFrontTexture.loadFromFile("Images/Front-1.png", false)) {}
-
+    if (!PlayerBackTexture.loadFromFile("Images/Back-3.png", false)) {}
+    if (!PlayerLeftTexture.loadFromFile("Images/Left-2.png", false)) {}
+    if (!PlayerRightTexture.loadFromFile("Images/Right-2.png", false)) {}
     if (!SnakeBodyTexture.loadFromFile("Images/SnakeBody.png", false)) {}
-
     if (!SnakeBodyBendTexture.loadFromFile("Images/SnakeBodyBend.png", false)) {}
-
     if (!SnakeHeadTexture.loadFromFile("Images/SnakeHead.png", false)) {}
     if (!SnakeTailTexture.loadFromFile("Images/SnakeTail.png", false)) {}
 
+    if (!BushTexture.loadFromFile("Images/Bush.png", false)) {}
+    if (!RockTexture.loadFromFile("Images/Rock.png", false)) {}
+    if (!GrassTexture.loadFromFile("Images/Grass.png", false)) {}
+    if (!StumpTexture.loadFromFile("Images/Stump.png", false)) {}
 
-    GrassShape.setFillColor(Color(34, 148, 106, 255));
-    GrassShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
-    RockShape.setFillColor(Color(204, 6, 5, 255));
-    RockShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
-    StumpShape.setFillColor(Color(20, 89, 201, 255));
-    StumpShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
-    BushShape.setFillColor(Color(237, 204, 32, 255));
-    BushShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
-    Player.setTexture(&PlayerFrontTexture, false);
-    Player.setSize(Vector2f(PLAYER_SIZEX, PLAYER_SIZEY));
-    Player.setPosition({playerPosX, playerPosY});
+    GrassSprite = new Sprite(GrassTexture);
+    RockSprite = new Sprite(RockTexture);
+    StumpSprite = new Sprite(StumpTexture);
+    BushSprite = new Sprite(BushTexture);
+    PlayerSprite = new Sprite(PlayerFrontTexture);
+    SnakeBodySprite = new Sprite(SnakeBodyTexture);
+    SnakeHeadSprite = new Sprite(SnakeHeadTexture);
+    SnakeTailSprite = new Sprite(SnakeTailTexture);
 
-    SnakeBodyShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
-    SnakeBodyShape.setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
-
-    SnakeHeadShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
-    SnakeHeadShape.setTexture(&SnakeHeadTexture, false);
-    SnakeHeadShape.setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
-
-    SnakeTailShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
-    SnakeTailShape.setTexture(&SnakeTailTexture, false);
-    SnakeTailShape.setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
+    SnakeBodySprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
+    SnakeHeadSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
+    SnakeTailSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
 
     thread thread(&renderingThread, &window);
-    
+
     while (window.isOpen())
     {
-       while (const optional event = window.pollEvent())
+        while (const optional event = window.pollEvent())
         {
-           if (event->is<Event::Closed>())
-               window.close();
+            if (event->is<Event::Closed>())
+                window.close();
         }
     }
     thread.join();

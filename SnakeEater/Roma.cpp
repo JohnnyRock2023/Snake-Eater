@@ -118,7 +118,7 @@ void moveSnakes() {
 							}
 							break;
 						}*/
-						// Ver 2
+				// Ver 2
 				case 0:
 					if (snakes[i].getDirect() == 1 || posY - OBJECT_SIZE < 0) {
 						j--;
@@ -239,16 +239,33 @@ void drawSnakes(RenderWindow* window) {
 	}
 }
 
+bool inRange(int value, int a, int b) {
+	return value >= min(a, b) && value <= max(a, b);
+}
+
 void attackSnake(Vector2f playerPos, int playerDirect) {
 	Vector2f snakePos;
 	for (int i = 0; i < snakes.size(); i++) {
 		for (int j = 0; j < snakes[i].getBody().size(); j++) {
 			snakePos = snakes[i].getBody()[j].pos;
-			if (playerDirect == 0 && playerPos.x == snakePos.x && playerPos.y == snakePos.y) {
-				if (playerPos.x == snakePos.x && (playerPos.y == snakePos.y || playerPos.y - OBJECT_SIZE == snakePos.y)) {
+			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPos.x, snakePos.x - OBJECT_SIZE / 2, snakePos.x + OBJECT_SIZE / 2 ) && inRange(playerPos.y, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE)) {
+				snakes[i].hitSnake();
+				score += 10;
+			}
+			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPos.x, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE) && inRange(playerPos.y, snakePos.y - OBJECT_SIZE / 2, snakePos.y + OBJECT_SIZE / 2)) {
+				snakes[i].hitSnake();
+				score += 10;
+			}
+		}
+	}
+}
 
-				}
-
+void deleteSnakes() {
+	for (int i = 0; i < snakes.size(); i++) {
+		for (int j = 0; j < snakes[i].getSize(); j++) {
+			if (snakes[i].getBody().size() <= 2) {
+				snakes.erase(snakes.begin() + i);
+				score += 30;
 			}
 		}
 	}

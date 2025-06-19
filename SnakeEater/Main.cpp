@@ -36,6 +36,7 @@ float viewPosY = (MAP_SIZEY / 2);
 
 void renderingThread(RenderWindow* window)
 {
+    AudioTrack();
     srand(time(NULL));
     View view({ viewPosX, viewPosY }, { SCREEN_RESX, SCREEN_RESY });
     window->setView(view);
@@ -99,7 +100,7 @@ void renderingThread(RenderWindow* window)
                 case 3:
                     PlayerSprite->setTexture(PlayerRightTexture, false); break;
                 }
-                view.setCenter({ viewPosX, viewPosY });
+                //view.setCenter({ viewPosX, viewPosY });
                 window->setView(view);
             }
 

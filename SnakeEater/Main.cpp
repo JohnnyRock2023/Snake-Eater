@@ -13,9 +13,18 @@ RectangleShape BushShape;
 RectangleShape Player;
 RectangleShape SnakeBodyShape;
 RectangleShape SnakeHeadShape;
+RectangleShape SnakeTailShape;
 
-float playerPosX = (MAP_SIZEX / 2) - (OBJECT_SIZE / 2);
-float playerPosY = (MAP_SIZEY / 2) - (OBJECT_SIZE / 2);
+Texture PlayerFrontTexture;
+Texture SnakeBodyTexture;
+Texture SnakeBodyBendTexture;
+Texture SnakeHeadTexture;
+Texture SnakeTailTexture;
+
+
+float playerPosX = (MAP_SIZEX / 2) - (PLAYER_SIZEX / 2);
+float playerPosY = (MAP_SIZEY / 2) - (PLAYER_SIZEY / 2);
+short int playerDirection = 1;
 float viewPosX = (MAP_SIZEX / 2);
 float viewPosY = (MAP_SIZEY / 2);
 
@@ -50,24 +59,28 @@ void renderingThread(RenderWindow* window)
                         viewPosY -= STEP;
                     }
                     playerPosY -= STEP;
+                    playerDirection = 0;
                 }
                 else if ((Keyboard::isKeyPressed(Keyboard::Key::S) || Keyboard::isKeyPressed(Keyboard::Key::Down)) && playerPosY < MAP_SIZEY - PLAYER_SIZEY) {
                     if (viewPosY + (SCREEN_RESY / 2) < MAP_SIZEY && playerPosY + (PLAYER_SIZEY / 2) == viewPosY) {
                         viewPosY += STEP;
                     }
                     playerPosY += STEP;
+                    playerDirection = 1;
                 }
                 if ((Keyboard::isKeyPressed(Keyboard::Key::A) || Keyboard::isKeyPressed(Keyboard::Key::Left)) && playerPosX > 0) {
                     if (viewPosX - (SCREEN_RESX / 2) > 0 && playerPosX + (PLAYER_SIZEX / 2) == viewPosX) {
                         viewPosX -= STEP;
                     }
                     playerPosX -= STEP;
+                    playerDirection = 2;
                 }
                 else if ((Keyboard::isKeyPressed(Keyboard::Key::D) || Keyboard::isKeyPressed(Keyboard::Key::Right)) && playerPosX < MAP_SIZEX - PLAYER_SIZEX) {
                     if (viewPosX + (SCREEN_RESX / 2) < MAP_SIZEX && playerPosX + (PLAYER_SIZEX / 2) == viewPosX) {
                         viewPosX += STEP;
                     }
                     playerPosX += STEP;
+                    playerDirection = 3;
                 }
                 Player.setPosition({playerPosX, playerPosY});
                 view.setCenter({ viewPosX, viewPosY });
@@ -101,6 +114,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     logo.loadFromFile("SnakeLogo.png");
     window.setIcon(logo);
 
+    if (!PlayerFrontTexture.loadFromFile("Images/Front-1.png", false)) {}
+
+    if (!SnakeBodyTexture.loadFromFile("Images/SnakeBody.png", false)) {}
+
+    if (!SnakeBodyBendTexture.loadFromFile("Images/SnakeBodyBend.png", false)) {}
+
+    if (!SnakeHeadTexture.loadFromFile("Images/SnakeHead.png", false)) {}
+    if (!SnakeTailTexture.loadFromFile("Images/SnakeTail.png", false)) {}
+
 
     GrassShape.setFillColor(Color(34, 148, 106, 255));
     GrassShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
@@ -110,13 +132,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     StumpShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
     BushShape.setFillColor(Color(237, 204, 32, 255));
     BushShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
-    Player.setFillColor(Color(255, 255, 255, 255));
+    Player.setTexture(&PlayerFrontTexture, false);
     Player.setSize(Vector2f(PLAYER_SIZEX, PLAYER_SIZEY));
     Player.setPosition({playerPosX, playerPosY});
-    SnakeBodyShape.setFillColor(Color(0, 0, 0, 255));
+
     SnakeBodyShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
-    SnakeHeadShape.setFillColor(Color(107, 50, 168, 255));
+    SnakeBodyShape.setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
+
     SnakeHeadShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
+    SnakeHeadShape.setTexture(&SnakeHeadTexture, false);
+    SnakeHeadShape.setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
+
+    SnakeTailShape.setSize(Vector2f(OBJECT_SIZE, OBJECT_SIZE));
+    SnakeTailShape.setTexture(&SnakeTailTexture, false);
+    SnakeTailShape.setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
 
     thread thread(&renderingThread, &window);
     

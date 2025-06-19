@@ -20,8 +20,8 @@ using namespace std;
 #define MAP_SIZEX 2500
 #define MAP_SIZEY 2000
 #define OBJECT_SIZE 30
-#define PLAYER_SIZEX 30
-#define PLAYER_SIZEY 50
+#define PLAYER_SIZEX 54
+#define PLAYER_SIZEY 76
 #define MIN_NUM_OF_OBJECTS 200
 #define MAX_NUM_OF_OBJECTS 500
 #define STEP 5
@@ -29,7 +29,7 @@ using namespace std;
 #define MIN_SNAKE_SIZE 3
 #define MAX_SNAKE_SIZE 7
 #define SNAKE_SPEED 500
-#define SNAKE_MOVES 2
+#define SNAKE_MOVES 3
 
 extern int game_status;
 
@@ -52,14 +52,26 @@ public:
 	}
 };
 
+class SnakeBody {
+public:
+	short int bodyDirect;
+	Vector2f pos;
+
+	SnakeBody(int direct, Vector2f pos) {
+		this->bodyDirect = direct;
+		this->pos = pos;
+	}
+
+};
+
 class Snake {
 private:
 	short int direction = 0;
 	short int size;
-	vector<Vector2f> body;
+	vector<SnakeBody> body;
 
 public:
-	Snake(int size, int direction, vector<Vector2f> &body)
+	Snake(int size, int direction, vector<SnakeBody> &body)
 	{
 		this->size = size;
 		this->body = body;
@@ -74,10 +86,10 @@ public:
 	void setDirect(int direction) {
 		this->direction = direction;
 	}
-	vector<Vector2f>& getBody() {
+	vector<SnakeBody>& getBody() {
 		return body;
 	}
-	void setBody(vector<Vector2f> body) {
+	void setBody(vector<SnakeBody> body) {
 		this->body = body;
 	}
 };
@@ -91,6 +103,13 @@ extern RectangleShape BushShape;
 extern RectangleShape Player;
 extern RectangleShape SnakeBodyShape;
 extern RectangleShape SnakeHeadShape;
+extern RectangleShape SnakeTailShape;
+
+extern Texture PlayerFrontTexture;
+extern Texture SnakeBodyTexture;
+extern Texture SnakeBodyBendTexture;
+extern Texture SnakeHeadTexture;
+extern Texture SnakeTailTexture;
 
 //FUNCTIONS
 

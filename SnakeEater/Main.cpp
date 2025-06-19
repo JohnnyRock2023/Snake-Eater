@@ -1,6 +1,7 @@
 #include "Header.h"
 
 int game_status = 1;
+int score = 0;
 
 // Objects
 vector<Object> objects;
@@ -28,8 +29,8 @@ Sprite* SnakeBodySprite = nullptr;
 Sprite* SnakeHeadSprite = nullptr;
 Sprite* SnakeTailSprite = nullptr;
 
-float playerPosX = (MAP_SIZEX / 2) - (PLAYER_SIZEX / 2);
-float playerPosY = (MAP_SIZEY / 2) - (PLAYER_SIZEY / 2);
+float playerPosX = (MAP_SIZEX / 2);
+float playerPosY = (MAP_SIZEY / 2);
 short int playerDirection = 1;
 float viewPosX = (MAP_SIZEX / 2);
 float viewPosY = (MAP_SIZEY / 2);
@@ -42,11 +43,13 @@ void renderingThread(RenderWindow* window)
     window->setView(view);
     window->setActive(true);
     setObjectsPos();
-    spawnSnakes(10);
+    spawnSnakes(30);
     Clock clock;
     Clock snakeClock;
+    Clock attackClock;
     float timer = 0;
     float snakeTimer = 0;
+    float attackTimer = 0;
 
     while (window->isOpen())
     {
@@ -58,32 +61,36 @@ void renderingThread(RenderWindow* window)
             snakeClock.restart();
             snakeTimer += snakeTime;
 
+            float attackTime = attackClock.getElapsedTime().asMilliseconds();
+            attackClock.restart();
+            attackTimer += attackTime;
+
             if (timer > SPEED) {
                 timer = 0;
 
-                if ((Keyboard::isKeyPressed(Keyboard::Key::W) || Keyboard::isKeyPressed(Keyboard::Key::Up)) && playerPosY > 0) {
-                    if (viewPosY - (SCREEN_RESY / 2) > 0 && playerPosY + (PLAYER_SIZEY / 2) == viewPosY) {
+                if ((Keyboard::isKeyPressed(Keyboard::Key::W) || Keyboard::isKeyPressed(Keyboard::Key::Up)) && playerPosY > PLAYER_SIZEY / 2) {
+                    if (viewPosY - (SCREEN_RESY / 2) > 0 && playerPosY == viewPosY) {
                         viewPosY -= STEP;
                     }
                     playerPosY -= STEP;
                     playerDirection = 0;
                 }
-                else if ((Keyboard::isKeyPressed(Keyboard::Key::S) || Keyboard::isKeyPressed(Keyboard::Key::Down)) && playerPosY < MAP_SIZEY - PLAYER_SIZEY) {
-                    if (viewPosY + (SCREEN_RESY / 2) < MAP_SIZEY && playerPosY + (PLAYER_SIZEY / 2) == viewPosY) {
+                else if ((Keyboard::isKeyPressed(Keyboard::Key::S) || Keyboard::isKeyPressed(Keyboard::Key::Down)) && playerPosY < MAP_SIZEY - PLAYER_SIZEY / 2) {
+                    if (viewPosY + (SCREEN_RESY / 2) < MAP_SIZEY && playerPosY == viewPosY) {
                         viewPosY += STEP;
                     }
                     playerPosY += STEP;
                     playerDirection = 1;
                 }
-                if ((Keyboard::isKeyPressed(Keyboard::Key::A) || Keyboard::isKeyPressed(Keyboard::Key::Left)) && playerPosX > 0) {
-                    if (viewPosX - (SCREEN_RESX / 2) > 0 && playerPosX + (PLAYER_SIZEX / 2) == viewPosX) {
+                if ((Keyboard::isKeyPressed(Keyboard::Key::A) || Keyboard::isKeyPressed(Keyboard::Key::Left)) && playerPosX > PLAYER_SIZEY / 2) {
+                    if (viewPosX - (SCREEN_RESX / 2) > 0 && playerPosX == viewPosX) {
                         viewPosX -= STEP;
                     }
                     playerPosX -= STEP;
                     playerDirection = 2;
                 }
-                else if ((Keyboard::isKeyPressed(Keyboard::Key::D) || Keyboard::isKeyPressed(Keyboard::Key::Right)) && playerPosX < MAP_SIZEX - PLAYER_SIZEX) {
-                    if (viewPosX + (SCREEN_RESX / 2) < MAP_SIZEX && playerPosX + (PLAYER_SIZEX / 2) == viewPosX) {
+                else if ((Keyboard::isKeyPressed(Keyboard::Key::D) || Keyboard::isKeyPressed(Keyboard::Key::Right)) && playerPosX < MAP_SIZEX - PLAYER_SIZEX / 2) {
+                    if (viewPosX + (SCREEN_RESX / 2) < MAP_SIZEX && playerPosX == viewPosX) {
                         viewPosX += STEP;
                     }
                     playerPosX += STEP;
@@ -100,7 +107,7 @@ void renderingThread(RenderWindow* window)
                 case 3:
                     PlayerSprite->setTexture(PlayerRightTexture, false); break;
                 }
-                //view.setCenter({ viewPosX, viewPosY });
+                view.setCenter({ viewPosX, viewPosY });
                 window->setView(view);
             }
 
@@ -108,10 +115,19 @@ void renderingThread(RenderWindow* window)
                 snakeTimer = 0;
                 moveSnakes();
             }
+
+            if (attackTimer > HIT_DELAY) {
+                if (Mouse::isButtonPressed(Mouse::Button::Left) || Keyboard::isKeyPressed(Keyboard::Key::Space)) {
+                    attackTimer = 0;
+                    attackSnake({ playerPosX, playerPosY }, playerDirection);
+                }
+            }
         }
-        window->clear(Color::Green);
+        window->clear({ 1, 154, 23, 255 });
         fillTheMapWithObj(window);
+        deleteSnakes();
         drawSnakes(window);
+        window->setTitle("Snake Eater \t\t\t\t Score: " + to_string(score));
         handleZoom(view);
         window->draw(*PlayerSprite);
         window->display();
@@ -157,6 +173,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     SnakeBodySprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
     SnakeHeadSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
     SnakeTailSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
+    PlayerSprite->setOrigin({ PLAYER_SIZEX / 2, PLAYER_SIZEY / 2 });
 
     thread thread(&renderingThread, &window);
 

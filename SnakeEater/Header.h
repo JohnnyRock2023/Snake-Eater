@@ -26,25 +26,27 @@ using namespace std;
 #define MAX_NUM_OF_OBJECTS 600
 #define STEP 5
 #define SPEED 12   // < 10 - Faster; > 10 - Slower
-#define MIN_SNAKE_SIZE 3
+#define MIN_SNAKE_SIZE 4
 #define MAX_SNAKE_SIZE 7
-#define SNAKE_SPEED 500
-#define SNAKE_MOVES 3
+#define SNAKE_SPEED 400
+#define SNAKE_MOVES 2
+#define HIT_DELAY 800
 
 extern float playerPosX;
 extern float playerPosY;
 extern int game_status;
+extern int score;
 
 class Object {
 private:
-    short int type;
-    Vector2f pos;
+	short int type;
+	Vector2f pos;
 
 public:
 	Object(int type, float posX, float posY)
 	{
 		this->type = type;
-		this->pos = {posX, posY};
+		this->pos = { posX, posY };
 	};
 	int getType() {
 		return type;
@@ -73,7 +75,7 @@ private:
 	vector<SnakeBody> body;
 
 public:
-	Snake(int size, int direction, vector<SnakeBody> &body)
+	Snake(int size, int direction, vector<SnakeBody>& body)
 	{
 		this->size = size;
 		this->body = body;
@@ -91,22 +93,23 @@ public:
 	vector<SnakeBody>& getBody() {
 		return body;
 	}
-	void setBody(vector<SnakeBody> body) {
-		this->body = body;
+	void hitSnake() {
+		this->size -= 1;
+		this->body.pop_back();
 	}
 };
 
 extern vector<Object> objects;
 extern vector<Snake> snakes;
 
-extern Sprite *GrassSprite;
-extern Sprite *RockSprite;
-extern Sprite *StumpSprite;
-extern Sprite *BushSprite;
-extern Sprite *PlayerSprite;
-extern Sprite *SnakeBodySprite;
-extern Sprite *SnakeHeadSprite;
-extern Sprite *SnakeTailSprite;
+extern Sprite* GrassSprite;
+extern Sprite* RockSprite;
+extern Sprite* StumpSprite;
+extern Sprite* BushSprite;
+extern Sprite* PlayerSprite;
+extern Sprite* SnakeBodySprite;
+extern Sprite* SnakeHeadSprite;
+extern Sprite* SnakeTailSprite;
 
 extern Texture PlayerFrontTexture;
 extern Texture RockTexture;
@@ -125,9 +128,11 @@ bool isPosNew(Vector2f pos);
 void spawnSnakes(int count);
 void moveSnakes();
 void drawSnakes(RenderWindow* window);
+void attackSnake(Vector2f playerPos, int playerDirect);
+void deleteSnakes();
 
 //VikaK
-void handleZoom(sf::View& view);
+void handleZoom(View& view);
 
 // Zadumina Zlata
 void AudioTrack();

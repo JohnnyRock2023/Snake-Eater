@@ -16,7 +16,7 @@ void AudioTrack() {
     }
 
     backMusic.setLooping(true);
-    backMusic.setVolume(100);
+    backMusic.setVolume(45);
     backMusic.play();
 }
 

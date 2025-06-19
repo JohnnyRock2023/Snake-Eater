@@ -21,20 +21,20 @@ void setObjectsPos() {
 void fillTheMapWithObj(RenderWindow* window) {
 	for (int i = 0; i < objects.size(); i++) {
 		if (objects[i].getType() == 0) {
-			GrassShape.setPosition(objects[i].getPos());
-			window->draw(GrassShape);
+			GrassSprite->setPosition(objects[i].getPos());
+			window->draw(*GrassSprite);
 		}
 		else if (objects[i].getType() == 1) {
-			RockShape.setPosition(objects[i].getPos());
-			window->draw(RockShape);
+			RockSprite->setPosition(objects[i].getPos());
+			window->draw(*RockSprite);
 		}
 		else if (objects[i].getType() == 2) {
-			StumpShape.setPosition(objects[i].getPos());
-			window->draw(StumpShape);
+			StumpSprite->setPosition(objects[i].getPos());
+			window->draw(*StumpSprite);
 		}
 		else if (objects[i].getType() == 3) {
-			BushShape.setPosition(objects[i].getPos());
-			window->draw(BushShape);
+			BushSprite->setPosition(objects[i].getPos());
+			window->draw(*BushSprite);
 		}
 	}
 }
@@ -188,12 +188,12 @@ void drawSnakes(RenderWindow* window) {
 			case 2: headAngle = degrees(90); break;
 			case 3: headAngle = degrees(270); break;
 		}
-		SnakeHeadShape.setRotation(headAngle);
-		SnakeHeadShape.setPosition(snakes[i].getBody()[0].pos);
-		window->draw(SnakeHeadShape);
+		SnakeHeadSprite->setRotation(headAngle);
+		SnakeHeadSprite->setPosition(snakes[i].getBody()[0].pos);
+		window->draw(*SnakeHeadSprite);
 		for (int j = 1; j < size - 1; j++) {
-			SnakeBodyShape.setPosition(snakes[i].getBody()[j].pos);
-			SnakeBodyShape.setTexture(&SnakeBodyBendTexture, false);
+			SnakeBodySprite->setPosition(snakes[i].getBody()[j].pos);
+			SnakeBodySprite->setTexture(SnakeBodyBendTexture, false);
 
 			direct1 = snakes[i].getBody()[j].bodyDirect;
 
@@ -203,28 +203,28 @@ void drawSnakes(RenderWindow* window) {
 			}
 
 			if (((direct2 == 3 && direct3 == 0) || (direct2 == 1 && direct3 == 2)) && direct1 != direct3) {
-				SnakeBodyShape.setRotation(degrees(0));
+				SnakeBodySprite->setRotation(degrees(0));
 			}
 			else if (((direct2 == 1 && direct3 == 3) || (direct2 == 2 && direct3 == 0)) && direct1 != direct3) {
-				SnakeBodyShape.setRotation(degrees(90));
+				SnakeBodySprite->setRotation(degrees(90));
 			}
 			else if (((direct2 == 2 && direct3 == 1) || (direct2 == 0 && direct3 == 3)) && direct1 != direct3) {
-				SnakeBodyShape.setRotation(degrees(180));
+				SnakeBodySprite->setRotation(degrees(180));
 			}
 			else if (((direct2 == 3 && direct3 == 1) || (direct2 == 0 && direct3 == 2)) && direct1 != direct3) {
-				SnakeBodyShape.setRotation(degrees(270));
+				SnakeBodySprite->setRotation(degrees(270));
 			}
 			else if (direct1 == 0 || direct1 == 1) {
-				SnakeBodyShape.setTexture(&SnakeBodyTexture, false);
-				SnakeBodyShape.setRotation(degrees(0));
+				SnakeBodySprite->setTexture(SnakeBodyTexture, false);
+				SnakeBodySprite->setRotation(degrees(0));
 			}
 			else if (direct1 == 2 || direct1 == 3) {
-				SnakeBodyShape.setTexture(&SnakeBodyTexture, false);
-				SnakeBodyShape.setRotation(degrees(90));
+				SnakeBodySprite->setTexture(SnakeBodyTexture, false);
+				SnakeBodySprite->setRotation(degrees(90));
 			}
 			direct2 = -1;
 			direct3 = -1;
-			window->draw(SnakeBodyShape);
+			window->draw(*SnakeBodySprite);
 		}
 		Angle tailAngle;
 		switch (snakes[i].getBody()[size-2].bodyDirect) {
@@ -233,9 +233,9 @@ void drawSnakes(RenderWindow* window) {
 		case 2: tailAngle = degrees(270); break;
 		case 3: tailAngle = degrees(90); break;
 		}
-		SnakeTailShape.setRotation(tailAngle);
-		SnakeTailShape.setPosition(snakes[i].getBody()[size-1].pos);
-		window->draw(SnakeTailShape);
+		SnakeTailSprite->setRotation(tailAngle);
+		SnakeTailSprite->setPosition(snakes[i].getBody()[size-1].pos);
+		window->draw(*SnakeTailSprite);
 	}
 }
 

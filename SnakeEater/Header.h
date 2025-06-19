@@ -20,10 +20,10 @@ using namespace std;
 #define MAP_SIZEX 2500
 #define MAP_SIZEY 2000
 #define OBJECT_SIZE 30
-#define PLAYER_SIZEX 54
-#define PLAYER_SIZEY 76
-#define MIN_NUM_OF_OBJECTS 200
-#define MAX_NUM_OF_OBJECTS 500
+#define PLAYER_SIZEX 66
+#define PLAYER_SIZEY 78
+#define MIN_NUM_OF_OBJECTS 300
+#define MAX_NUM_OF_OBJECTS 600
 #define STEP 5
 #define SPEED 12   // < 10 - Faster; > 10 - Slower
 #define MIN_SNAKE_SIZE 3
@@ -96,16 +96,19 @@ public:
 
 extern vector<Object> objects;
 extern vector<Snake> snakes;
-extern RectangleShape GrassShape;
-extern RectangleShape RockShape;
-extern RectangleShape StumpShape;
-extern RectangleShape BushShape;
-extern RectangleShape Player;
-extern RectangleShape SnakeBodyShape;
-extern RectangleShape SnakeHeadShape;
-extern RectangleShape SnakeTailShape;
+
+extern Sprite *GrassSprite;
+extern Sprite *RockSprite;
+extern Sprite *StumpSprite;
+extern Sprite *BushSprite;
+extern Sprite *PlayerSprite;
+extern Sprite *SnakeBodySprite;
+extern Sprite *SnakeHeadSprite;
+extern Sprite *SnakeTailSprite;
 
 extern Texture PlayerFrontTexture;
+extern Texture RockTexture;
+extern Texture BushTexture;
 extern Texture SnakeBodyTexture;
 extern Texture SnakeBodyBendTexture;
 extern Texture SnakeHeadTexture;

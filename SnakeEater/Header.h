@@ -31,6 +31,8 @@ using namespace std;
 #define SNAKE_SPEED 500
 #define SNAKE_MOVES 3
 
+extern float playerPosX;
+extern float playerPosY;
 extern int game_status;
 
 class Object {
@@ -123,3 +125,6 @@ bool isPosNew(Vector2f pos);
 void spawnSnakes(int count);
 void moveSnakes();
 void drawSnakes(RenderWindow* window);
+
+//VikaK
+void handleZoom(sf::View& view);

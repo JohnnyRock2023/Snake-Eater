@@ -83,7 +83,7 @@ void renderingThread(RenderWindow* window)
                     playerDirection = 3;
                 }
                 Player.setPosition({playerPosX, playerPosY});
-                view.setCenter({ viewPosX, viewPosY });
+                //view.setCenter({ viewPosX, viewPosY });
                 window->setView(view);
             }
 
@@ -92,6 +92,7 @@ void renderingThread(RenderWindow* window)
                 moveSnakes();
             }
         }
+        handleZoom(view);
         window->clear(Color::Green);
         fillTheMapWithObj(window);
         drawSnakes(window);

@@ -128,3 +128,6 @@ void drawSnakes(RenderWindow* window);
 
 //VikaK
 void handleZoom(sf::View& view);
+
+// Zadumina Zlata
+void AudioTrack();

@@ -149,7 +149,7 @@ void renderingThread(RenderWindow* window)
             if (attackTimer > HIT_DELAY) {
                 if (Mouse::isButtonPressed(Mouse::Button::Left) || Keyboard::isKeyPressed(Keyboard::Key::Space)) {
                     attackTimer = 0;
-                    attackSnake({ playerPosX, playerPosY }, playerDirection);
+                    attackSnake(playerDirection);
                 }
             }
 

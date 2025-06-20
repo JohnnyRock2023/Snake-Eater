@@ -243,17 +243,17 @@ bool inRange(int value, int a, int b) {
 	return value >= min(a, b) && value <= max(a, b);
 }
 
-void attackSnake(Vector2f playerPos, int playerDirect) {
+void attackSnake(int playerDirect) {
 	Vector2f snakePos;
 	for (int i = 0; i < snakes.size(); i++) {
 		for (int j = 0; j < snakes[i].getBody().size(); j++) {
 			snakePos = snakes[i].getBody()[j].pos;
-			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPos.x, snakePos.x - OBJECT_SIZE / 2, snakePos.x + OBJECT_SIZE / 2 ) && inRange(playerPos.y, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE)) {
+			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPosX + PLAYER_SIZEX/2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE *2) && inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE *2, snakePos.y + OBJECT_SIZE*3)) {
 				snakes[i].hitSnake();
 				score += 10;
 				PlayHitSnakeSound();
 			}
-			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPos.x, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE) && inRange(playerPos.y, snakePos.y - OBJECT_SIZE / 2, snakePos.y + OBJECT_SIZE / 2)) {
+			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPosX + PLAYER_SIZEX/2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE*3) && inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE )) {
 				snakes[i].hitSnake();
 				score += 10;
 				PlayHitSnakeSound();

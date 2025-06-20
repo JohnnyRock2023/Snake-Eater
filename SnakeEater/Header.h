@@ -147,7 +147,7 @@ void fillTheMapWithObj(RenderWindow* window);
 void spawnSnakes(int count);
 void moveSnakes();
 void drawSnakes(RenderWindow* window);
-void attackSnake(Vector2f playerPos, int playerDirect);
+void attackSnake(int playerDirect);
 void deleteSnakes();
 bool inRange(int value, int a, int b);
 void drawGround(RenderWindow* window);

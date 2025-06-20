@@ -37,6 +37,8 @@ using namespace std;
 
 extern float playerPosX;
 extern float playerPosY;
+extern float viewPosX;
+extern float viewPosY;
 extern int game_status;
 extern int score;
 

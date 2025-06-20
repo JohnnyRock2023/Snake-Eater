@@ -185,8 +185,8 @@ void drawSnakes(RenderWindow* window) {
 		switch (snakes[i].getBody()[0].bodyDirect) {
 			case 0: headAngle = degrees(0); break;
 			case 1: headAngle = degrees(180); break;
-			case 2: headAngle = degrees(90); break;
-			case 3: headAngle = degrees(270); break;
+			case 2: headAngle = degrees(270); break;
+			case 3: headAngle = degrees(90); break;
 		}
 		SnakeHeadSprite->setRotation(headAngle);
 		SnakeHeadSprite->setPosition(snakes[i].getBody()[0].pos);
@@ -267,6 +267,15 @@ void deleteSnakes() {
 				snakes.erase(snakes.begin() + i);
 				score += 30;
 			}
+		}
+	}
+}
+
+void drawSnakes(RenderWindow *window) {
+	for (int posX = 0; posX < MAP_SIZEX; posX += 100) {
+		for (int posY = 0; posY < MAP_SIZEY; posY += 100) {
+			GroundSprite.setPosition({ posX, posY });
+			window->draw(*GroundSprite);
 		}
 	}
 }

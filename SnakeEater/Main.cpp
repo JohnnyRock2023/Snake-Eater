@@ -37,6 +37,9 @@ float viewPosY = (MAP_SIZEY / 2);
 
 void renderingThread(RenderWindow* window)
 {
+    if (!FootStepSound()) {
+        return;
+    }
     AudioTrack();
     srand(time(NULL));
     View view({ viewPosX, viewPosY }, { SCREEN_RESX, SCREEN_RESY });
@@ -73,6 +76,7 @@ void renderingThread(RenderWindow* window)
                         viewPosY -= STEP;
                     }
                     playerPosY -= STEP;
+                    PlayFootStepSound();
                     playerDirection = 0;
                 }
                 else if ((Keyboard::isKeyPressed(Keyboard::Key::S) || Keyboard::isKeyPressed(Keyboard::Key::Down)) && playerPosY < MAP_SIZEY - PLAYER_SIZEY / 2) {
@@ -80,6 +84,7 @@ void renderingThread(RenderWindow* window)
                         viewPosY += STEP;
                     }
                     playerPosY += STEP;
+                    PlayFootStepSound();
                     playerDirection = 1;
                 }
                 if ((Keyboard::isKeyPressed(Keyboard::Key::A) || Keyboard::isKeyPressed(Keyboard::Key::Left)) && playerPosX > PLAYER_SIZEY / 2) {
@@ -87,6 +92,7 @@ void renderingThread(RenderWindow* window)
                         viewPosX -= STEP;
                     }
                     playerPosX -= STEP;
+                    PlayFootStepSound();
                     playerDirection = 2;
                 }
                 else if ((Keyboard::isKeyPressed(Keyboard::Key::D) || Keyboard::isKeyPressed(Keyboard::Key::Right)) && playerPosX < MAP_SIZEX - PLAYER_SIZEX / 2) {
@@ -94,6 +100,7 @@ void renderingThread(RenderWindow* window)
                         viewPosX += STEP;
                     }
                     playerPosX += STEP;
+                    PlayFootStepSound();
                     playerDirection = 3;
                 }
                 PlayerSprite->setPosition({ playerPosX, playerPosY });

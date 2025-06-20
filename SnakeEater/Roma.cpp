@@ -279,3 +279,58 @@ void drawGround(RenderWindow *window) {
 		}
 	}
 }
+
+bool isObjectPosNew(float posX, float posY) {
+	for (int i = 0; i < objects.size(); i++) {
+		if (posX == objects[i].getPos().x && posY == objects[i].getPos().y) {
+			return false;
+		}
+	}
+	return true;
+}
+void snakeBite() {
+	float posX;
+	float posY;
+	for (int i = 0; i < snakes.size(); i++) {
+		posX = snakes[i].getBody()[0].pos.x;
+		posY = snakes[i].getBody()[0].pos.y;
+		if (inRange(playerPosX + PLAYER_SIZEX/2, posX - OBJECT_SIZE, posX + OBJECT_SIZE*3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE, posY + OBJECT_SIZE * 3)) {
+			isPoisoned = true;
+		}
+	}
+}
+void setAntidotesPos() {
+	float posX;
+	float posY;
+	int count = MIN_NUM_OF_ANTIDOTES + rand() % MAX_NUM_OF_ANTIDOTES;
+	for (int i = 0; i < count; i++) {
+		posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
+		posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
+		if (isObjectPosNew(posX, posY) {
+			antidotes.push_back({ posX + OBJECT_SIZE / 2; posY + OBJECT_SIZE / 2});
+		}
+		else
+			i--;
+	}
+}
+void drawAntidotes(RenderWindow* window) {
+	for (int i = 0; i < antidotes.size(); i++) {
+		AntidoteSprite.setPosition(antidotes[i]);
+		window->draw(AntidoteSprite);
+	}
+
+}
+void useAntidote() {
+	float posX;
+	float posY;
+	for (int i = 0; i < antidotes.size(); i++) {
+		posX = snakes[i].getBody()[0].pos.x;
+		posY = snakes[i].getBody()[0].pos.y;
+		if (inRange(playerPosX + PLAYER_SIZEX / 2, posX - OBJECT_SIZE / 2, posX + OBJECT_SIZE * 3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE / 2 , posY + OBJECT_SIZE * 3)) {
+			isPoisoned = false;
+			poisonTimer = 0;
+			antidotes.erase(antidotes.begin() + i);
+			return;
+		}
+	}
+}

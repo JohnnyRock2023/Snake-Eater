@@ -116,6 +116,8 @@ extern Sprite* SnakeBodySprite;
 extern Sprite* SnakeHeadSprite;
 extern Sprite* SnakeTailSprite;
 extern Sprite* GroundSprite;
+extern Sprite* StartButtonSprite;
+extern Sprite* ExitButtonSprite;
 
 extern Texture PlayerFrontTexture;
 extern Texture RockTexture;
@@ -125,6 +127,8 @@ extern Texture SnakeBodyBendTexture;
 extern Texture SnakeHeadTexture;
 extern Texture SnakeTailTexture;
 extern Texture GroundTexture;
+extern Texture StartButtonTexture;
+extern Texture ExitButtonTexture;
 
 //FUNCTIONS
 
@@ -147,3 +151,7 @@ void handleZoom(View& view);
 void AudioTrack();
 bool FootStepSound();
 void PlayFootStepSound();
+
+//Vika Pavlenko
+void showStartMenu(RenderWindow* window);
+void showPauseMenu(RenderWindow* window);

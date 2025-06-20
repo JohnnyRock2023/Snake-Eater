@@ -20,6 +20,8 @@ Texture GrassTexture;
 Texture StumpTexture;
 Texture BushTexture;
 Texture GroundTexture;
+Texture StartButtonTexture;
+Texture ExitButtonTexture;
 
 Sprite* GrassSprite = nullptr;
 Sprite* RockSprite = nullptr;
@@ -30,6 +32,8 @@ Sprite* SnakeBodySprite = nullptr;
 Sprite* SnakeHeadSprite = nullptr;
 Sprite* SnakeTailSprite = nullptr;
 Sprite* GroundSprite = nullptr;
+Sprite* StartButtonSprite = nullptr;
+Sprite* ExitButtonSprite = nullptr;
 
 float playerPosX = (MAP_SIZEX / 2);
 float playerPosY = (MAP_SIZEY / 2);
@@ -56,6 +60,11 @@ void renderingThread(RenderWindow* window)
 
     while (window->isOpen())
     {
+        if (Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
+            if (game_status == 1) {
+                game_status = 2;
+            }
+        }
         if (game_status == 1) {
             float time = clock.getElapsedTime().asMilliseconds();
             clock.restart();
@@ -137,6 +146,14 @@ void renderingThread(RenderWindow* window)
         window->setTitle("Snake Eater \t\t\t\t Score: " + to_string(score));
         handleZoom(view);
         window->draw(*PlayerSprite);
+        if (game_status == 0) {
+            showStartMenu(window);
+        }
+        if (game_status == 2) {
+            View pauseView({ MAP_SIZEX / 2.f, MAP_SIZEY / 2.f }, { SCREEN_RESX, SCREEN_RESY });
+            window->setView(pauseView);
+            showPauseMenu(window);
+        }
         window->display();
     }
 }
@@ -168,6 +185,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     if (!GrassTexture.loadFromFile("Images/Grass.png", false)) {}
     if (!StumpTexture.loadFromFile("Images/Stump.png", false)) {}
     if (!GroundTexture.loadFromFile("Images/Overworld.png", false)) {}
+    if (!StartButtonTexture.loadFromFile("Images/Play.png", false)) {}
+    if (!ExitButtonTexture.loadFromFile("Images/Quit.png", false)) {}
 
     GrassSprite = new Sprite(GrassTexture);
     RockSprite = new Sprite(RockTexture);
@@ -178,6 +197,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     SnakeHeadSprite = new Sprite(SnakeHeadTexture);
     SnakeTailSprite = new Sprite(SnakeTailTexture);
     GroundSprite = new Sprite(GroundTexture);
+    StartButtonSprite = new Sprite(StartButtonTexture);
+    ExitButtonSprite = new Sprite(ExitButtonTexture);
 
     SnakeBodySprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
     SnakeHeadSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });

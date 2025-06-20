@@ -151,6 +151,8 @@ void handleZoom(View& view);
 void AudioTrack();
 bool FootStepSound();
 void PlayFootStepSound();
+bool HitSnakeSound();
+void PlayHitSnakeSound();
 
 //Vika Pavlenko
 void showStartMenu(RenderWindow* window);

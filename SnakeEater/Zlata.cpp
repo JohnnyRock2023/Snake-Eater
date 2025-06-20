@@ -8,8 +8,28 @@ using namespace sf;
 using namespace std;
 
 sf::Music backMusic;
+
 sf::SoundBuffer stepBuff;
 std::unique_ptr<sf::Sound> stepSound;
+
+sf::SoundBuffer hitSnakeBuff;
+std::unique_ptr<sf::Sound> hitSnakeSound;
+
+bool HitSnakeSound() {
+    if (!hitSnakeBuff.loadFromFile("backMusic file/eat_snake_sound.ogg")) {
+        MessageBoxA(NULL, "Не вдалося завантажити файл eat_snake_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
+        return false;
+    }
+    hitSnakeSound = std::make_unique<sf::Sound>(hitSnakeBuff);
+    return true;
+}
+
+void PlayHitSnakeSound() {
+    if (hitSnakeSound && hitSnakeSound->getStatus() != sf::SoundSource::Status::Playing) {
+        hitSnakeSound->setVolume(150);
+        hitSnakeSound->play();
+    }
+}
 
 bool FootStepSound() {
     if (!stepBuff.loadFromFile("backMusic file/footstep_sound.ogg")) {

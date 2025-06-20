@@ -251,10 +251,12 @@ void attackSnake(Vector2f playerPos, int playerDirect) {
 			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPos.x, snakePos.x - OBJECT_SIZE / 2, snakePos.x + OBJECT_SIZE / 2 ) && inRange(playerPos.y, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE)) {
 				snakes[i].hitSnake();
 				score += 10;
+				PlayHitSnakeSound();
 			}
 			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPos.x, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE) && inRange(playerPos.y, snakePos.y - OBJECT_SIZE / 2, snakePos.y + OBJECT_SIZE / 2)) {
 				snakes[i].hitSnake();
 				score += 10;
+				PlayHitSnakeSound();
 			}
 		}
 	}

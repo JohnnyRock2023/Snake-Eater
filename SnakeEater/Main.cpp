@@ -43,6 +43,7 @@ float viewPosY = (MAP_SIZEY / 2);
 
 void renderingThread(RenderWindow* window)
 {
+    HitSnakeSound();
     FootStepSound();
     AudioTrack();
     srand(time(NULL));

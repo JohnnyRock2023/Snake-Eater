@@ -1,11 +1,18 @@
 #include "Header.h"
 
-int game_status = 1;
+int game_status = 0;
 int score = 0;
+bool isPoisoned = false;
+
+float timer = 0;
+float snakeTimer = 0;
+float attackTimer = 0;
+float poisonTimer = 0;
 
 // Objects
 vector<Object> objects;
 vector<Snake> snakes;
+vector<Vector2f> antidotes;
 
 Texture PlayerFrontTexture;
 Texture PlayerBackTexture;
@@ -22,6 +29,7 @@ Texture BushTexture;
 Texture GroundTexture;
 Texture StartButtonTexture;
 Texture ExitButtonTexture;
+Texture AntidoteTexture;
 
 Sprite* GrassSprite = nullptr;
 Sprite* RockSprite = nullptr;
@@ -34,6 +42,7 @@ Sprite* SnakeTailSprite = nullptr;
 Sprite* GroundSprite = nullptr;
 Sprite* StartButtonSprite = nullptr;
 Sprite* ExitButtonSprite = nullptr;
+Sprite* AntidoteSprite = nullptr;
 
 float playerPosX = (MAP_SIZEX / 2);
 float playerPosY = (MAP_SIZEY / 2);
@@ -51,13 +60,13 @@ void renderingThread(RenderWindow* window)
     window->setView(view);
     window->setActive(true);
     setObjectsPos();
+    setAntidotesPos();
     spawnSnakes(30);
+
     Clock clock;
     Clock snakeClock;
     Clock attackClock;
-    float timer = 0;
-    float snakeTimer = 0;
-    float attackTimer = 0;
+    Clock poisonClock;
 
     while (window->isOpen())
     {
@@ -77,6 +86,10 @@ void renderingThread(RenderWindow* window)
             float attackTime = attackClock.getElapsedTime().asMilliseconds();
             attackClock.restart();
             attackTimer += attackTime;
+
+            float poisonTime = poisonClock.getElapsedTime().asSeconds();
+            poisonClock.restart();
+            poisonTimer += poisonTime;
 
             if (timer > SPEED) {
                 timer = 0;
@@ -130,7 +143,7 @@ void renderingThread(RenderWindow* window)
 
             if (snakeTimer > SNAKE_SPEED) {
                 snakeTimer = 0;
-                moveSnakes();
+                //moveSnakes();
             }
 
             if (attackTimer > HIT_DELAY) {
@@ -139,14 +152,25 @@ void renderingThread(RenderWindow* window)
                     attackSnake({ playerPosX, playerPosY }, playerDirection);
                 }
             }
+
+            if (isPoisoned) {
+                poisonTimer += poisonTime;
+            }
+
+            if (poisonTimer > DEATH) {
+                //window->setTitle("It's over!");
+            }
         }
         drawGround(window);
         fillTheMapWithObj(window);
+        drawAntidotes(window);
         deleteSnakes();
         drawSnakes(window);
-        window->setTitle("Snake Eater \t\t\t\t Score: " + to_string(score));
+        //window->setTitle("Snake Eater \t\t\t\t Score: " + to_string(score));
+        window->setTitle(to_string(isPoisoned));
         handleZoom(view);
         window->draw(*PlayerSprite);
+        snakeBite();
         if (game_status == 0) {
             showStartMenu(window);
         }
@@ -154,6 +178,9 @@ void renderingThread(RenderWindow* window)
             View pauseView({ MAP_SIZEX / 2.f, MAP_SIZEY / 2.f }, { SCREEN_RESX, SCREEN_RESY });
             window->setView(pauseView);
             showPauseMenu(window);
+        }
+        if (isPoisoned) {
+            useAntidote();
         }
         window->display();
     }
@@ -188,6 +215,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     if (!GroundTexture.loadFromFile("Images/Overworld.png", false)) {}
     if (!StartButtonTexture.loadFromFile("Images/Play.png", false)) {}
     if (!ExitButtonTexture.loadFromFile("Images/Quit.png", false)) {}
+    if (!AntidoteTexture.loadFromFile("Images/Antidote.png", false)) {}
 
     GrassSprite = new Sprite(GrassTexture);
     RockSprite = new Sprite(RockTexture);
@@ -200,11 +228,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     GroundSprite = new Sprite(GroundTexture);
     StartButtonSprite = new Sprite(StartButtonTexture);
     ExitButtonSprite = new Sprite(ExitButtonTexture);
+    AntidoteSprite = new Sprite(AntidoteTexture);
 
     SnakeBodySprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
     SnakeHeadSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
     SnakeTailSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
     PlayerSprite->setOrigin({ PLAYER_SIZEX / 2, PLAYER_SIZEY / 2 });
+    AntidoteSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
 
     thread thread(&renderingThread, &window);
 

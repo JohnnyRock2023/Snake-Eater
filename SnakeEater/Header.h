@@ -33,6 +33,10 @@ using namespace std;
 #define HIT_DELAY 500
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 90
+#define DEATH 10
+#define MIN_NUM_OF_ANTIDOTES 2
+#define MAX_NUM_OF_ANTIDOTES 4
+
 
 
 extern float playerPosX;
@@ -41,6 +45,8 @@ extern float viewPosX;
 extern float viewPosY;
 extern int game_status;
 extern int score;
+extern bool isPoisoned;
+extern float poisonTimer;
 
 class Object {
 private:
@@ -106,6 +112,7 @@ public:
 
 extern vector<Object> objects;
 extern vector<Snake> snakes;
+extern vector<Vector2f> antidotes;
 
 extern Sprite* GrassSprite;
 extern Sprite* RockSprite;
@@ -118,6 +125,7 @@ extern Sprite* SnakeTailSprite;
 extern Sprite* GroundSprite;
 extern Sprite* StartButtonSprite;
 extern Sprite* ExitButtonSprite;
+extern Sprite* AntidoteSprite;
 
 extern Texture PlayerFrontTexture;
 extern Texture RockTexture;
@@ -129,13 +137,13 @@ extern Texture SnakeTailTexture;
 extern Texture GroundTexture;
 extern Texture StartButtonTexture;
 extern Texture ExitButtonTexture;
+extern Texture AntidoteTexture;
 
 //FUNCTIONS
 
 //Kutsenko Roman
 void setObjectsPos();
 void fillTheMapWithObj(RenderWindow* window);
-bool isPosNew(Vector2f pos);
 void spawnSnakes(int count);
 void moveSnakes();
 void drawSnakes(RenderWindow* window);
@@ -143,6 +151,13 @@ void attackSnake(Vector2f playerPos, int playerDirect);
 void deleteSnakes();
 bool inRange(int value, int a, int b);
 void drawGround(RenderWindow* window);
+bool isObjectPosNew(float posX, float posY);
+bool isSnakePosNew(Vector2f pos);
+void snakeBite();
+void drawAntidotes(RenderWindow* window);
+void setAntidotesPos();
+void useAntidote();
+
 
 //VikaK
 void handleZoom(View& view);

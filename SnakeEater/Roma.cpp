@@ -308,8 +308,8 @@ void setAntidotesPos() {
 	for (int i = 0; i < count; i++) {
 		posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
 		posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
-		if (isObjectPosNew(posX, posY) {
-			antidotes.push_back({ posX + OBJECT_SIZE / 2; posY + OBJECT_SIZE / 2});
+		if (isObjectPosNew(posX, posY)) {
+			antidotes.push_back({ posX + OBJECT_SIZE / 2, posY + OBJECT_SIZE / 2});
 		}
 		else
 			i--;
@@ -317,8 +317,8 @@ void setAntidotesPos() {
 }
 void drawAntidotes(RenderWindow* window) {
 	for (int i = 0; i < antidotes.size(); i++) {
-		AntidoteSprite.setPosition(antidotes[i]);
-		window->draw(AntidoteSprite);
+		AntidoteSprite->setPosition(antidotes[i]);
+		window->draw(*AntidoteSprite);
 	}
 
 }
@@ -328,7 +328,7 @@ void useAntidote() {
 	for (int i = 0; i < antidotes.size(); i++) {
 		posX = snakes[i].getBody()[0].pos.x;
 		posY = snakes[i].getBody()[0].pos.y;
-		if (inRange(playerPosX + PLAYER_SIZEX / 2, posX - OBJECT_SIZE / 2, posX + OBJECT_SIZE * 3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE / 2 , posY + OBJECT_SIZE * 3)) {
+		if (inRange(playerPosX + PLAYER_SIZEX / 2, posX - OBJECT_SIZE / 2, posX + OBJECT_SIZE * 3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE/2 , posY + OBJECT_SIZE)) {
 			isPoisoned = false;
 			poisonTimer = 0;
 			antidotes.erase(antidotes.begin() + i);

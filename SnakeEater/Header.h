@@ -136,3 +136,5 @@ void handleZoom(View& view);
 
 // Zadumina Zlata
 void AudioTrack();
+bool FootStepSound();
+void PlayFootStepSound();

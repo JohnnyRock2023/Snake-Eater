@@ -30,7 +30,10 @@ using namespace std;
 #define MAX_SNAKE_SIZE 7
 #define SNAKE_SPEED 400
 #define SNAKE_MOVES 2
-#define HIT_DELAY 800
+#define HIT_DELAY 500
+#define BUTTON_WIDTH 200
+#define BUTTON_HEIGHT 90
+
 
 extern float playerPosX;
 extern float playerPosY;
@@ -110,6 +113,7 @@ extern Sprite* PlayerSprite;
 extern Sprite* SnakeBodySprite;
 extern Sprite* SnakeHeadSprite;
 extern Sprite* SnakeTailSprite;
+extern Sprite* GroundSprite;
 
 extern Texture PlayerFrontTexture;
 extern Texture RockTexture;
@@ -118,6 +122,7 @@ extern Texture SnakeBodyTexture;
 extern Texture SnakeBodyBendTexture;
 extern Texture SnakeHeadTexture;
 extern Texture SnakeTailTexture;
+extern Texture GroundTexture;
 
 //FUNCTIONS
 
@@ -130,6 +135,8 @@ void moveSnakes();
 void drawSnakes(RenderWindow* window);
 void attackSnake(Vector2f playerPos, int playerDirect);
 void deleteSnakes();
+bool inRange(int value, int a, int b);
+void drawGround(RenderWindow* window);
 
 //VikaK
 void handleZoom(View& view);

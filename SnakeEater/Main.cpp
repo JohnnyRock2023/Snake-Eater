@@ -19,6 +19,7 @@ Texture RockTexture;
 Texture GrassTexture;
 Texture StumpTexture;
 Texture BushTexture;
+Texture GroundTexture;
 
 Sprite* GrassSprite = nullptr;
 Sprite* RockSprite = nullptr;
@@ -28,6 +29,7 @@ Sprite* PlayerSprite = nullptr;
 Sprite* SnakeBodySprite = nullptr;
 Sprite* SnakeHeadSprite = nullptr;
 Sprite* SnakeTailSprite = nullptr;
+Sprite* GroundSprite = nullptr;
 
 float playerPosX = (MAP_SIZEX / 2);
 float playerPosY = (MAP_SIZEY / 2);
@@ -37,9 +39,7 @@ float viewPosY = (MAP_SIZEY / 2);
 
 void renderingThread(RenderWindow* window)
 {
-    if (!FootStepSound()) {
-        return;
-    }
+    FootStepSound();
     AudioTrack();
     srand(time(NULL));
     View view({ viewPosX, viewPosY }, { SCREEN_RESX, SCREEN_RESY });
@@ -130,7 +130,7 @@ void renderingThread(RenderWindow* window)
                 }
             }
         }
-        window->clear({ 1, 154, 23, 255 });
+        drawGround(window);
         fillTheMapWithObj(window);
         deleteSnakes();
         drawSnakes(window);
@@ -158,15 +158,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     if (!PlayerBackTexture.loadFromFile("Images/Back-3.png", false)) {}
     if (!PlayerLeftTexture.loadFromFile("Images/Left-2.png", false)) {}
     if (!PlayerRightTexture.loadFromFile("Images/Right-2.png", false)) {}
-    if (!SnakeBodyTexture.loadFromFile("Images/SnakeBody.png", false)) {}
-    if (!SnakeBodyBendTexture.loadFromFile("Images/SnakeBodyBend.png", false)) {}
-    if (!SnakeHeadTexture.loadFromFile("Images/SnakeHead.png", false)) {}
-    if (!SnakeTailTexture.loadFromFile("Images/SnakeTail.png", false)) {}
+    if (!SnakeBodyTexture.loadFromFile("Images/body.png", false)) {}
+    if (!SnakeBodyBendTexture.loadFromFile("Images/bend.png", false)) {}
+    if (!SnakeHeadTexture.loadFromFile("Images/head.png", false)) {}
+    if (!SnakeTailTexture.loadFromFile("Images/tail.png", false)) {}
 
     if (!BushTexture.loadFromFile("Images/Bush.png", false)) {}
     if (!RockTexture.loadFromFile("Images/Rock.png", false)) {}
     if (!GrassTexture.loadFromFile("Images/Grass.png", false)) {}
     if (!StumpTexture.loadFromFile("Images/Stump.png", false)) {}
+    if (!GroundTexture.loadFromFile("Images/Overworld.png", false)) {}
 
     GrassSprite = new Sprite(GrassTexture);
     RockSprite = new Sprite(RockTexture);
@@ -176,6 +177,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     SnakeBodySprite = new Sprite(SnakeBodyTexture);
     SnakeHeadSprite = new Sprite(SnakeHeadTexture);
     SnakeTailSprite = new Sprite(SnakeTailTexture);
+    GroundSprite = new Sprite(GroundTexture);
 
     SnakeBodySprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
     SnakeHeadSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });

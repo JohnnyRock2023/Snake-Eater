@@ -271,10 +271,10 @@ void deleteSnakes() {
 	}
 }
 
-void drawSnakes(RenderWindow *window) {
-	for (int posX = 0; posX < MAP_SIZEX; posX += 100) {
-		for (int posY = 0; posY < MAP_SIZEY; posY += 100) {
-			GroundSprite.setPosition({ posX, posY });
+void drawGround(RenderWindow *window) {
+	for (float posX = 0; posX < MAP_SIZEX; posX += 100) {
+		for (float posY = 0; posY < MAP_SIZEY; posY += 100) {
+			GroundSprite->setPosition({ posX, posY });
 			window->draw(*GroundSprite);
 		}
 	}

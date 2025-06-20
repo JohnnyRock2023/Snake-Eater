@@ -296,7 +296,7 @@ void snakeBite() {
 	for (int i = 0; i < snakes.size(); i++) {
 		posX = snakes[i].getBody()[0].pos.x;
 		posY = snakes[i].getBody()[0].pos.y;
-		if (inRange(playerPosX + PLAYER_SIZEX/2, posX - OBJECT_SIZE, posX + OBJECT_SIZE*3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE, posY + OBJECT_SIZE * 3)) {
+		if (inRange(playerPosX + PLAYER_SIZEX/2, posX - OBJECT_SIZE, posX + OBJECT_SIZE*3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE, posY + OBJECT_SIZE *2)) {
 			isPoisoned = true;
 		}
 	}
@@ -322,13 +322,9 @@ void drawAntidotes(RenderWindow* window) {
 	}
 
 }
-void useAntidote() {
-	float posX;
-	float posY;
+void useAntidote() {;
 	for (int i = 0; i < antidotes.size(); i++) {
-		posX = snakes[i].getBody()[0].pos.x;
-		posY = snakes[i].getBody()[0].pos.y;
-		if (inRange(playerPosX + PLAYER_SIZEX / 2, posX - OBJECT_SIZE / 2, posX + OBJECT_SIZE * 3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE/2 , posY + OBJECT_SIZE)) {
+		if (inRange(playerPosX + PLAYER_SIZEX / 2, antidotes[i].x - OBJECT_SIZE / 2, antidotes[i].x + OBJECT_SIZE * 2) && inRange(playerPosY + PLAYER_SIZEY / 2, antidotes[i].y - OBJECT_SIZE/2 , antidotes[i].y + OBJECT_SIZE)) {
 			isPoisoned = false;
 			poisonTimer = 0;
 			antidotes.erase(antidotes.begin() + i);

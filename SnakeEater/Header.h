@@ -170,7 +170,7 @@ void displayTimeToDeath(RenderWindow* window);
 void restart();
 
 //VikaK
-void handleZoom(View& view);
+void handleZoom(sf::View& view);
 
 // Zadumina Zlata
 void AudioTrack();

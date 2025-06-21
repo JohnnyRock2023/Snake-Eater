@@ -44,6 +44,7 @@ extern float viewPosY;
 extern int game_status;
 extern short int playerDirection;
 extern int score;
+extern int bestScore;
 extern bool isPoisoned;
 extern float poisonTimer;
 extern float pauseTimer;
@@ -142,10 +143,11 @@ extern Texture StartButtonTexture;
 extern Texture ExitButtonTexture;
 extern Texture AntidoteTexture;
 
-extern Text *textScore;
-extern Text *timeToDeath;
+extern Text* textScore;
+extern Text* textBestScore;
+extern Text* timeToDeath;
 
-extern Clock *poisonClock;
+extern Clock* poisonClock;
 
 //FUNCTIONS
 
@@ -168,9 +170,10 @@ void useAntidote();
 void displayScore(RenderWindow* window);
 void displayTimeToDeath(RenderWindow* window);
 void restart();
+void isTheBest();
 
 //VikaK
-void handleZoom(sf::View& view);
+void handleZoom(View& view);
 
 // Zadumina Zlata
 void AudioTrack();

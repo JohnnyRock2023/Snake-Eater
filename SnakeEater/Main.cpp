@@ -2,6 +2,7 @@
 
 int game_status = 0;
 int score = 0;
+int bestScore = 0;
 bool isPoisoned = false;
 
 float timer = 0;
@@ -9,6 +10,7 @@ float snakeTimer = 0;
 float attackTimer = 0;
 float poisonTimer = 0;
 float pauseTimer = 0;
+
 
 // Objects
 vector<Object> objects;
@@ -34,8 +36,9 @@ Texture StartButtonTexture;
 Texture ExitButtonTexture;
 Texture AntidoteTexture;
 
-Text *textScore = nullptr;
-Text *timeToDeath = nullptr;
+Text* textScore = nullptr;
+Text* textBestScore = nullptr;
+Text* timeToDeath = nullptr;
 
 Sprite* GrassSprite = nullptr;
 Sprite* RockSprite = nullptr;
@@ -170,7 +173,7 @@ void renderingThread(RenderWindow* window)
 				snakeTimer = 0;
 				moveSnakes();
 			}
-			handleZoom(view);
+
 			view.setCenter({ viewPosX, viewPosY });
 			window->setView(view);
 			drawGround(window);
@@ -180,6 +183,7 @@ void renderingThread(RenderWindow* window)
 			drawSnakes(window);
 
 			if (game_status == 1) {
+				handleZoom(view);
 				window->draw(*PlayerSprite);
 				if (!isPoisoned) {
 					snakeBite();
@@ -240,11 +244,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!font.openFromFile("Fonts/Arial.ttf")) {}
 
 	textScore = new Text(font);
+	textBestScore = new Text(font);
 	timeToDeath = new Text(font);
 
 	textScore->setCharacterSize(30);
+	textBestScore->setCharacterSize(30);
 	timeToDeath->setCharacterSize(30);
 	textScore->setFillColor(Color::Black);
+	textBestScore->setFillColor(Color::Black);
 	timeToDeath->setFillColor(Color::Black);
 
 	GrassSprite = new Sprite(GrassTexture);

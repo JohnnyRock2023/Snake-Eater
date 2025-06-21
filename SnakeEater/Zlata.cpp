@@ -24,6 +24,33 @@ std::unique_ptr<sf::Sound> antidoteSound;
 sf::SoundBuffer snakeBiteBuff;
 std::unique_ptr<sf::Sound> snakeBiteSound;
 
+sf::SoundBuffer timerBuff;
+std::unique_ptr<sf::Sound> timerSound;
+
+bool TimerSoundFunc() {
+    if (!timerBuff.loadFromFile("backMusic file/oclock_sound.ogg")) {
+        MessageBoxA(NULL, "Не вдалося завантажити файл oclock_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
+        return false;
+    }
+    timerSound = std::make_unique<sf::Sound>(timerBuff);
+    return true;
+}
+
+void PlayTimerSound(float speed) {
+    if (timerSound) {
+        timerSound->setVolume(70);
+        timerSound->setPitch(speed);
+        if (timerSound->getStatus() != sf::SoundSource::Status::Playing)
+            timerSound->play();
+    }
+}
+
+void StopTimerSound() {
+    if (timerSound && timerSound->getStatus() == sf::SoundSource::Status::Playing) {
+        timerSound->stop();
+    }
+}
+
 bool SnakeBiteSoundFunc() {
     if (!snakeBiteBuff.loadFromFile("backMusic file/bite_sound.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл bite_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);

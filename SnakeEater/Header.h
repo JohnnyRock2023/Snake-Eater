@@ -187,6 +187,9 @@ bool AntidoteSoundFunc();
 void PlayAntidoteSound();
 bool SnakeBiteSoundFunc();
 void PlaySnakeBiteSound();
+bool TimerSoundFunc();
+void PlayTimerSound(float speed = 1.0f);
+void StopTimerSound();
 
 //Vika Pavlenko
 void showStartMenu(RenderWindow* window);

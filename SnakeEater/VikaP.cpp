@@ -108,6 +108,7 @@ void showPauseMenu(RenderWindow* window) {
 			window->setTitle("Menu clicked!");
 			PlayButtonClickSound();
 			restart();
+			StopTimerSound();
 			game_status = 0;
 			pauseTimer = 0;
 		}
@@ -116,6 +117,7 @@ void showPauseMenu(RenderWindow* window) {
 
 void showDeathScreen(RenderWindow* window) {
 
+	StopTimerSound();
 	posForButtonX = viewPosX - SCREEN_RESX / 2;
 	posForButtonY = viewPosY - SCREEN_RESY / 2;
 	pauseButtonX = viewPosX - BUTTON_WIDTH / 2;
@@ -155,6 +157,7 @@ void showDeathScreen(RenderWindow* window) {
 			PlayButtonClickSound();
 			window->setTitle("Menu clicked!");
 			restart();
+			StopTimerSound();
 			game_status = 0;
 			pauseTimer = 0;
 		}

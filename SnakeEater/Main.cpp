@@ -63,6 +63,7 @@ float viewPosY = (MAP_SIZEY / 2);
 
 void renderingThread(RenderWindow* window)
 {
+	TimerSoundFunc();
 	SnakeBiteSoundFunc();
 	AntidoteSoundFunc();
 	ButtonClickSoundFunc();

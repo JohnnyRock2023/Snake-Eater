@@ -313,6 +313,7 @@ void snakeBite() {
 			isPoisoned = true;
 			poisonClock->restart();
 			PlaySnakeBiteSound();
+			PlayTimerSound();
 		}
 	}
 }
@@ -361,12 +362,14 @@ void displayScore(RenderWindow* window) {
 void displayTimeToDeath(RenderWindow* window) {
 	if (isPoisoned) {
 		timeToDeath->setPosition({ viewPosX - SCREEN_RESX / 2 + 300 , viewPosY - SCREEN_RESY / 2 + 15 });
-		if (poisonTimer >= DEATH / 2 - 1) {
-			timeToDeath->setFillColor(Color::Red);
+		float timeLeft = DEATH - poisonTimer;
+		if (timeLeft <= 5.0f) {
+			PlayTimerSound(1.7f);
 		}
 		else {
-			timeToDeath->setFillColor(Color::Black);
+			PlayTimerSound(1.0f);
 		}
+		timeToDeath->setFillColor(timeLeft < DEATH / 2 - 1 ? Color::Red : Color::Black);
 		timeToDeath->setString(to_string((int)(DEATH - poisonTimer)));
 		window->draw(*timeToDeath);
 	}

@@ -35,7 +35,7 @@ bool SnakeBiteSoundFunc() {
 
 void PlaySnakeBiteSound() {
     if (snakeBiteSound && snakeBiteSound->getStatus() != sf::SoundSource::Status::Playing) {
-        snakeBiteSound->setVolume(80);
+        snakeBiteSound->setVolume(60);
         snakeBiteSound->play();
     }
 }

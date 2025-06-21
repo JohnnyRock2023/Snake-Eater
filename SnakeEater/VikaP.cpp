@@ -97,16 +97,16 @@ void showPauseMenu(RenderWindow* window) {
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, restartButtonY, restartButtonY + BUTTON_HEIGHT)) {
-			PlayButtonClickSound();
 			window->setTitle("Restart clicked!");
+			PlayButtonClickSound();
 			restart();
 			game_status = 1;
 		}
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, menuButtonY, menuButtonY + BUTTON_HEIGHT)) {
-			PlayButtonClickSound();
 			window->setTitle("Menu clicked!");
+			PlayButtonClickSound();
 			restart();
 			game_status = 0;
 			pauseTimer = 0;
@@ -144,6 +144,7 @@ void showDeathScreen(RenderWindow* window) {
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, restartButtonY, restartButtonY + BUTTON_HEIGHT)) {
+			PlayButtonClickSound();
 			window->setTitle("Restart clicked!");
 			restart();
 			game_status = 1;
@@ -151,6 +152,7 @@ void showDeathScreen(RenderWindow* window) {
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, menuButtonY, menuButtonY + BUTTON_HEIGHT)) {
+			PlayButtonClickSound();
 			window->setTitle("Menu clicked!");
 			restart();
 			game_status = 0;

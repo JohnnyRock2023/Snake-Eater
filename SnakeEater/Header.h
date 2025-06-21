@@ -22,8 +22,8 @@ using namespace std;
 #define OBJECT_SIZE 30
 #define PLAYER_SIZEX 66
 #define PLAYER_SIZEY 78
-#define MIN_NUM_OF_OBJECTS 300
-#define MAX_NUM_OF_OBJECTS 600
+#define MIN_NUM_OF_OBJECTS 200
+#define MAX_NUM_OF_OBJECTS 400
 #define STEP 5
 #define SPEED 12   // < 10 - Faster; > 10 - Slower
 #define MIN_SNAKE_SIZE 4
@@ -37,8 +37,6 @@ using namespace std;
 #define MIN_NUM_OF_ANTIDOTES 2
 #define MAX_NUM_OF_ANTIDOTES 4
 
-
-
 extern float playerPosX;
 extern float playerPosY;
 extern float viewPosX;
@@ -47,6 +45,7 @@ extern int game_status;
 extern int score;
 extern bool isPoisoned;
 extern float poisonTimer;
+extern float pauseTimer;
 
 class Object {
 private:
@@ -76,7 +75,6 @@ public:
 		this->bodyDirect = direct;
 		this->pos = pos;
 	}
-
 };
 
 class Snake {
@@ -128,8 +126,10 @@ extern Sprite* ExitButtonSprite;
 extern Sprite* AntidoteSprite;
 
 extern Texture PlayerFrontTexture;
-extern Texture RockTexture;
-extern Texture BushTexture;
+extern Texture RockLTexture;
+extern Texture RockSTexture;
+extern Texture BushLTexture;
+extern Texture BushSTexture;
 extern Texture SnakeBodyTexture;
 extern Texture SnakeBodyBendTexture;
 extern Texture SnakeHeadTexture;
@@ -157,7 +157,6 @@ void snakeBite();
 void drawAntidotes(RenderWindow* window);
 void setAntidotesPos();
 void useAntidote();
-
 
 //VikaK
 void handleZoom(View& view);

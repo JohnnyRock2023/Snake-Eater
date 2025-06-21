@@ -4,17 +4,17 @@ void setObjectsPos() {
 	float posX;
 	float posY;
 	short int type;
-	for (int i = 0; i < (MIN_NUM_OF_OBJECTS + rand() % MAX_NUM_OF_OBJECTS); i++) {
-		type = rand() % 4;
+	int count = MIN_NUM_OF_OBJECTS + rand() % MAX_NUM_OF_OBJECTS;
+	for (int i = 0; i < count; i++) {
+		type = rand() % 6;
 		posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
 		posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
 
-		for (int j = 0; j < objects.size(); j++) {
-			if (posX == objects[j].getPos().x && posY == objects[j].getPos().y) {
-				i--;
-			}
+		if (isObjectPosNew(posX, posY)) {
+			objects.push_back(Object(type, posX, posY));
 		}
-		objects.push_back(Object(type, posX, posY));
+		else
+			i--;
 	}
 }
 
@@ -26,20 +26,32 @@ void fillTheMapWithObj(RenderWindow* window) {
 		}
 		else if (objects[i].getType() == 1) {
 			RockSprite->setPosition(objects[i].getPos());
+			RockSprite->setTexture(RockLTexture);
 			window->draw(*RockSprite);
 		}
 		else if (objects[i].getType() == 2) {
+			RockSprite->setPosition(objects[i].getPos());
+			RockSprite->setTexture(RockSTexture);
+			window->draw(*RockSprite);
+		}
+		else if (objects[i].getType() == 3) {
 			StumpSprite->setPosition(objects[i].getPos());
 			window->draw(*StumpSprite);
 		}
-		else if (objects[i].getType() == 3) {
+		else if (objects[i].getType() == 4) {
 			BushSprite->setPosition(objects[i].getPos());
+			BushSprite->setTexture(BushLTexture);
+			window->draw(*BushSprite);
+		}
+		else if (objects[i].getType() == 5) {
+			BushSprite->setPosition(objects[i].getPos());
+			BushSprite->setTexture(BushSTexture);
 			window->draw(*BushSprite);
 		}
 	}
 }
 
-bool isPosNew(Vector2f pos) {
+bool isSnakesPosNew(Vector2f pos) {
 	float posX;
 	float posY;
 	for (int i = 0; i < snakes.size(); i++) {
@@ -62,7 +74,7 @@ void spawnSnakes(int count) {
 		posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
 		posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
 
-		while (!isPosNew({ posX, posY })) {
+		while (!isSnakesPosNew({ posX, posY })) {
 			posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
 			posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
 		}
@@ -248,7 +260,7 @@ void attackSnake(int playerDirect) {
 	for (int i = 0; i < snakes.size(); i++) {
 		for (int j = 0; j < snakes[i].getBody().size(); j++) {
 			snakePos = snakes[i].getBody()[j].pos;
-			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPosX + PLAYER_SIZEX/2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE *2) && inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE *2, snakePos.y + OBJECT_SIZE*3)) {
+			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPosX + PLAYER_SIZEX/2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 2) && inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE*3)) {
 				snakes[i].hitSnake();
 				score += 10;
 				PlayHitSnakeSound();

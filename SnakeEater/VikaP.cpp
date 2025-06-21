@@ -1,15 +1,15 @@
 #include "Header.h"
 
-float posForButtonX = (MAP_SIZEX / 2) - SCREEN_RESX / 2;
-float posForButtonY = (MAP_SIZEY / 2) - SCREEN_RESY / 2;
-float startButtonPosX = MAP_SIZEX / 2 - BUTTON_WIDTH / 2;
-float startButtonPosY = MAP_SIZEY / 2 + 20;
-float exitButtonPosX = MAP_SIZEX / 2 - BUTTON_WIDTH / 2;
-float exitButtonPosY = MAP_SIZEY / 2 + 130;
-float pauseButtonX = MAP_SIZEX / 2 - BUTTON_WIDTH / 2;
-float continueButtonY = MAP_SIZEY / 2 - 100;
-float restartButtonY = MAP_SIZEY / 2;
-float menuButtonY = MAP_SIZEY / 2 + 100;
+float posForButtonX = viewPosX - SCREEN_RESX / 2;
+float posForButtonY = viewPosY - SCREEN_RESY / 2;
+float startButtonPosX = viewPosX - BUTTON_WIDTH / 2;
+float startButtonPosY = viewPosY + 20;
+float exitButtonPosX = viewPosX - BUTTON_WIDTH / 2;
+float exitButtonPosY = viewPosY + 130;
+float pauseButtonX = viewPosX - BUTTON_WIDTH / 2;
+float continueButtonY = viewPosY - 100;
+float restartButtonY = viewPosY;
+float menuButtonY = viewPosY + 100;
 
 void showStartMenu(RenderWindow* window) {
 	StartButtonSprite->setPosition({ startButtonPosX, startButtonPosY });
@@ -17,7 +17,7 @@ void showStartMenu(RenderWindow* window) {
 
 	RectangleShape title({ 1000, 200 });
 	title.setFillColor(Color::Red);
-	title.setPosition({ MAP_SIZEX / 2 - title.getSize().x / 2,  MAP_SIZEY / 2 - 300 });
+	title.setPosition({ viewPosX - title.getSize().x / 2,  viewPosY - 300 });
 
 	window->draw(title);
 	window->draw(*StartButtonSprite);
@@ -39,9 +39,19 @@ void showStartMenu(RenderWindow* window) {
 }
 
 void showPauseMenu(RenderWindow* window) {
+
+	posForButtonX = viewPosX - SCREEN_RESX / 2;
+	posForButtonY = viewPosY - SCREEN_RESY / 2;
+	pauseButtonX = viewPosX - BUTTON_WIDTH / 2;
+	continueButtonY = viewPosY - 100;
+	restartButtonY = viewPosY;
+	menuButtonY = viewPosY + 100;
+	exitButtonPosX = viewPosX - BUTTON_WIDTH / 2;
+	exitButtonPosY = viewPosY + 130;
+
 	RectangleShape titlePause({ 500.f, 100.f });
 	titlePause.setFillColor(Color::White);
-	titlePause.setPosition({ MAP_SIZEX / 2.f - 250.f, MAP_SIZEY / 2.f - 250.f });
+	titlePause.setPosition({ viewPosX - 250.f, viewPosY - 250.f });
 
 	RectangleShape continueButton({ BUTTON_WIDTH, BUTTON_HEIGHT });
 	continueButton.setFillColor(Color::Green);
@@ -54,13 +64,17 @@ void showPauseMenu(RenderWindow* window) {
 	RectangleShape exitButton({ BUTTON_WIDTH, BUTTON_HEIGHT });
 	exitButton.setFillColor(Color::Red);
     exitButton.setPosition({ pauseButtonX, menuButtonY });
-
 	window->draw(titlePause);
 	window->draw(continueButton);
 	window->draw(restartButton);
 	window->draw(exitButton);
 
-	if (Mouse::isButtonPressed(Mouse::Button::Left)) {
+	if (pauseTimer > 300 && Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
+		game_status = 1;
+		pauseTimer = 0;
+	}
+
+	else if (Mouse::isButtonPressed(Mouse::Button::Left)) {
 		Vector2i mousePos = Mouse::getPosition(*window);
 		float mouseX = posForButtonX + mousePos.x;
 		float mouseY = posForButtonY + mousePos.y;
@@ -73,7 +87,6 @@ void showPauseMenu(RenderWindow* window) {
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, restartButtonY, restartButtonY + BUTTON_HEIGHT)) {
 			window->setTitle("Restart clicked!");
-			//функція для початку заново
 		}
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&

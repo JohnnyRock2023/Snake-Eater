@@ -42,6 +42,7 @@ extern float playerPosY;
 extern float viewPosX;
 extern float viewPosY;
 extern int game_status;
+extern short int playerDirection;
 extern int score;
 extern bool isPoisoned;
 extern float poisonTimer;
@@ -89,6 +90,8 @@ public:
 		this->size = size;
 		this->body = body;
 		this->direction = direction;
+	};
+	~Snake() {
 	};
 	int getSize() {
 		return size;
@@ -139,6 +142,11 @@ extern Texture StartButtonTexture;
 extern Texture ExitButtonTexture;
 extern Texture AntidoteTexture;
 
+extern Text *textScore;
+extern Text *timeToDeath;
+
+extern Clock *poisonClock;
+
 //FUNCTIONS
 
 //Kutsenko Roman
@@ -157,6 +165,9 @@ void snakeBite();
 void drawAntidotes(RenderWindow* window);
 void setAntidotesPos();
 void useAntidote();
+void displayScore(RenderWindow* window);
+void displayTimeToDeath(RenderWindow* window);
+void restart();
 
 //VikaK
 void handleZoom(View& view);
@@ -171,3 +182,4 @@ void PlayHitSnakeSound();
 //Vika Pavlenko
 void showStartMenu(RenderWindow* window);
 void showPauseMenu(RenderWindow* window);
+void showDeathScreen(RenderWindow* window);

@@ -34,6 +34,9 @@ Texture StartButtonTexture;
 Texture ExitButtonTexture;
 Texture AntidoteTexture;
 
+Text *textScore = nullptr;
+Text *timeToDeath = nullptr;
+
 Sprite* GrassSprite = nullptr;
 Sprite* RockSprite = nullptr;
 Sprite* StumpSprite = nullptr;
@@ -46,6 +49,8 @@ Sprite* GroundSprite = nullptr;
 Sprite* StartButtonSprite = nullptr;
 Sprite* ExitButtonSprite = nullptr;
 Sprite* AntidoteSprite = nullptr;
+
+Clock* poisonClock = nullptr;
 
 float playerPosX = (MAP_SIZEX / 2);
 float playerPosY = (MAP_SIZEY / 2);
@@ -69,8 +74,8 @@ void renderingThread(RenderWindow* window)
 	Clock clock;
 	Clock snakeClock;
 	Clock attackClock;
-	Clock poisonClock;
 	Clock pauseClock;
+	poisonClock = new Clock;
 
 	while (window->isOpen())
 	{
@@ -90,10 +95,6 @@ void renderingThread(RenderWindow* window)
 			float attackTime = attackClock.getElapsedTime().asMilliseconds();
 			attackClock.restart();
 			attackTimer += attackTime;
-
-			float poisonTime = poisonClock.getElapsedTime().asSeconds();
-			poisonClock.restart();
-			poisonTimer += poisonTime;
 
 			if (timer > SPEED) {
 				timer = 0;
@@ -141,8 +142,6 @@ void renderingThread(RenderWindow* window)
 				case 3:
 					PlayerSprite->setTexture(PlayerRightTexture, false); break;
 				}
-				view.setCenter({ viewPosX, viewPosY });
-				window->setView(view);
 			}
 
 			if (attackTimer > HIT_DELAY) {
@@ -153,14 +152,16 @@ void renderingThread(RenderWindow* window)
 			}
 
 			if (isPoisoned) {
+				float poisonTime = poisonClock->getElapsedTime().asSeconds();
+				poisonClock->restart();
 				poisonTimer += poisonTime;
 			}
 
 			if (poisonTimer > DEATH) {
-				//window->setTitle("It's over!");
+				game_status = 3;
 			}
 		}
-		if (game_status == 1 || game_status == 0) {
+		if (game_status == 1 || game_status == 0 || game_status == 3) {
 			float snakeTime = snakeClock.getElapsedTime().asMilliseconds();
 			snakeClock.restart();
 			snakeTimer += snakeTime;
@@ -169,25 +170,36 @@ void renderingThread(RenderWindow* window)
 				snakeTimer = 0;
 				moveSnakes();
 			}
-		}
 
-		drawGround(window);
-		fillTheMapWithObj(window);
-		drawAntidotes(window);
-		deleteSnakes();
-		drawSnakes(window);
-		window->setTitle(to_string(isPoisoned));
-		handleZoom(view);
-		window->draw(*PlayerSprite);
-		snakeBite();
+			view.setCenter({ viewPosX, viewPosY });
+			window->setView(view);
+			drawGround(window);
+			fillTheMapWithObj(window);
+			drawAntidotes(window);
+			deleteSnakes();
+			drawSnakes(window);
+
+			if (game_status == 1) {
+				handleZoom(view);
+				window->draw(*PlayerSprite);
+				if (!isPoisoned) {
+					snakeBite();
+				}
+				if (isPoisoned) {
+					useAntidote();
+				}
+			}
+			displayScore(window);
+			displayTimeToDeath(window);
+		}
 		if (game_status == 0) {
 			showStartMenu(window);
 		}
 		if (game_status == 2) {
 			showPauseMenu(window);
 		}
-		if (isPoisoned) {
-			useAntidote();
+		if (game_status == 3) {
+			showDeathScreen(window);
 		}
 		window->display();
 	}
@@ -225,6 +237,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!ExitButtonTexture.loadFromFile("Images/Quit.png", false)) {}
 	if (!AntidoteTexture.loadFromFile("Images/Antidote.png", false)) {}
 
+	Font font;
+	if (!font.openFromFile("Fonts/Arial.ttf")) {}
+
+	textScore = new Text(font);
+	timeToDeath = new Text(font);
+
+	textScore->setCharacterSize(30);
+	timeToDeath->setCharacterSize(30);
+	textScore->setFillColor(Color::Black);
+	timeToDeath->setFillColor(Color::Black);
+
 	GrassSprite = new Sprite(GrassTexture);
 	RockSprite = new Sprite(RockLTexture);
 	StumpSprite = new Sprite(StumpTexture);
@@ -237,6 +260,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	StartButtonSprite = new Sprite(StartButtonTexture);
 	ExitButtonSprite = new Sprite(ExitButtonTexture);
 	AntidoteSprite = new Sprite(AntidoteTexture);
+
 
 	SnakeBodySprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
 	SnakeHeadSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });

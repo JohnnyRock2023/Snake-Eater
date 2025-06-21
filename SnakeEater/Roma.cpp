@@ -278,6 +278,7 @@ void deleteSnakes() {
 	for (int i = 0; i < snakes.size(); i++) {
 		for (int j = 0; j < snakes[i].getSize(); j++) {
 			if (snakes[i].getBody().size() <= 2) {
+				snakes[i].getBody().clear();
 				snakes.erase(snakes.begin() + i);
 				score += 30;
 			}
@@ -310,6 +311,7 @@ void snakeBite() {
 		posY = snakes[i].getBody()[0].pos.y;
 		if (inRange(playerPosX + PLAYER_SIZEX/2, posX - OBJECT_SIZE, posX + OBJECT_SIZE*3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE, posY + OBJECT_SIZE *2)) {
 			isPoisoned = true;
+			poisonClock->restart();
 		}
 	}
 }
@@ -343,4 +345,44 @@ void useAntidote() {;
 			return;
 		}
 	}
+}
+
+void displayScore(RenderWindow* window) {
+	textScore->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 , viewPosY - SCREEN_RESY / 2 + 15});
+	textScore->setString("SCORE: " + to_string(score));
+	window->draw(*textScore);
+}
+
+void displayTimeToDeath(RenderWindow* window) {
+	if (isPoisoned) {
+		timeToDeath->setPosition({ viewPosX - SCREEN_RESX / 2 + 300 , viewPosY - SCREEN_RESY / 2 + 15 });
+		if (poisonTimer >= DEATH / 2 - 1) {
+			timeToDeath->setFillColor(Color::Red);
+		}
+		else {
+			timeToDeath->setFillColor(Color::Black);
+		}
+		timeToDeath->setString(to_string((int)(DEATH - poisonTimer)));
+		window->draw(*timeToDeath);
+	}
+}
+
+void restart() {
+	for (int i = 0; i < snakes.size(); i++) {
+		snakes[i].getBody().clear();
+	}
+	snakes.clear();
+	objects.clear();
+	antidotes.clear();
+	score = 0;
+	isPoisoned = false;
+	poisonTimer = 0;
+	playerPosX = (MAP_SIZEX / 2);
+	playerPosY = (MAP_SIZEY / 2);
+	playerDirection = 1;
+	viewPosX = (MAP_SIZEX / 2);
+	viewPosY = (MAP_SIZEY / 2);
+	setObjectsPos();
+	setAntidotesPos();
+	spawnSnakes(30);
 }

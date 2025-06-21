@@ -173,7 +173,7 @@ void renderingThread(RenderWindow* window)
 				snakeTimer = 0;
 				moveSnakes();
 			}
-
+			handleZoom(view);
 			view.setCenter({ viewPosX, viewPosY });
 			window->setView(view);
 			drawGround(window);
@@ -183,7 +183,6 @@ void renderingThread(RenderWindow* window)
 			drawSnakes(window);
 
 			if (game_status == 1) {
-				handleZoom(view);
 				window->draw(*PlayerSprite);
 				if (!isPoisoned) {
 					snakeBite();

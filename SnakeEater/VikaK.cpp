@@ -20,7 +20,7 @@ void handleZoom(sf::View& view) {
         currentZoom *= factor;
     }
 
-    Vector2f playerCenter(playerPosX + PLAYER_SIZEX / 2.f, playerPosY + PLAYER_SIZEY / 2.f);
+    Vector2f playerCenter(playerPosX, playerPosY);
     Vector2f halfView = view.getSize() / 2.f;
 
     float minX = halfView.x;

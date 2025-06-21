@@ -1,7 +1,8 @@
 #include "Header.h"
 
 void handleZoom(sf::View& view) {
-    static bool isZoomed = false;
+    if (game_status != 1) return;
+
     static float currentZoom = 1.f;
     static float targetZoom = 1.f;
     static const float zoomInFactor = 0.6f;
@@ -11,13 +12,7 @@ void handleZoom(sf::View& view) {
     float deltaTime = zoomClock.restart().asSeconds();
 
     bool isRightPressed = sf::Mouse::isButtonPressed(sf::Mouse::Button::Right);
-
-    if (isRightPressed) {
-        targetZoom = zoomInFactor;
-    }
-    else {
-        targetZoom = 1.f;
-    }
+    targetZoom = isRightPressed ? zoomInFactor : 1.f;
 
     if (std::abs(currentZoom - targetZoom) > 0.001f) {
         float factor = 1.f + (targetZoom - currentZoom) * zoomSpeed * deltaTime;
@@ -37,5 +32,6 @@ void handleZoom(sf::View& view) {
     newCenter.x = std::clamp(playerCenter.x, minX, maxX);
     newCenter.y = std::clamp(playerCenter.y, minY, maxY);
 
-    view.setCenter(newCenter);
+    viewPosX = newCenter.x;
+    viewPosY = newCenter.y;
 }

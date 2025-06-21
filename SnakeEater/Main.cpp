@@ -63,6 +63,8 @@ float viewPosY = (MAP_SIZEY / 2);
 
 void renderingThread(RenderWindow* window)
 {
+	AntidoteSoundFunc();
+	ButtonClickSoundFunc();
 	HitSnakeSound();
 	FootStepSound();
 	AudioTrack();

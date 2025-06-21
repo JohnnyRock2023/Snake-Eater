@@ -181,6 +181,10 @@ bool FootStepSound();
 void PlayFootStepSound();
 bool HitSnakeSound();
 void PlayHitSnakeSound();
+bool ButtonClickSoundFunc();
+void PlayButtonClickSound();
+bool AntidoteSoundFunc();
+void PlayAntidoteSound();
 
 //Vika Pavlenko
 void showStartMenu(RenderWindow* window);

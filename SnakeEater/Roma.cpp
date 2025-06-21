@@ -339,6 +339,7 @@ void drawAntidotes(RenderWindow* window) {
 void useAntidote() {;
 	for (int i = 0; i < antidotes.size(); i++) {
 		if (inRange(playerPosX + PLAYER_SIZEX / 2, antidotes[i].x - OBJECT_SIZE / 2, antidotes[i].x + OBJECT_SIZE * 2) && inRange(playerPosY + PLAYER_SIZEY / 2, antidotes[i].y - OBJECT_SIZE/2 , antidotes[i].y + OBJECT_SIZE)) {
+			PlayAntidoteSound();
 			isPoisoned = false;
 			poisonTimer = 0;
 			antidotes.erase(antidotes.begin() + i);

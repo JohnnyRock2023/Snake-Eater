@@ -35,11 +35,13 @@ void showStartMenu(RenderWindow* window) {
 		Vector2i mousePos = Mouse::getPosition(*window);
 		// Натиск на кнопку старт
 		if (inRange(posForButtonX + mousePos.x, startButtonPosX, startButtonPosX + BUTTON_WIDTH) && inRange(posForButtonY + mousePos.y, startButtonPosY, startButtonPosY + BUTTON_HEIGHT)) {
+			PlayButtonClickSound();
 			window->setTitle("Start!");
 			game_status = 1;
 		}
 		// Натиск на кнопку виходу
 		if (inRange(posForButtonX + mousePos.x, exitButtonPosX, exitButtonPosX + BUTTON_WIDTH) && inRange(posForButtonY + mousePos.y, exitButtonPosY, exitButtonPosY + BUTTON_HEIGHT)) {
+			PlayButtonClickSound();
 			window->close();
 			window->setTitle("Exit!");
 		}
@@ -88,12 +90,14 @@ void showPauseMenu(RenderWindow* window) {
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, continueButtonY, continueButtonY + BUTTON_HEIGHT)) {
+			PlayButtonClickSound();
 			poisonClock->restart();
 			game_status = 1;
 		}
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, restartButtonY, restartButtonY + BUTTON_HEIGHT)) {
+			PlayButtonClickSound();
 			window->setTitle("Restart clicked!");
 			restart();
 			game_status = 1;
@@ -101,6 +105,7 @@ void showPauseMenu(RenderWindow* window) {
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, menuButtonY, menuButtonY + BUTTON_HEIGHT)) {
+			PlayButtonClickSound();
 			window->setTitle("Menu clicked!");
 			restart();
 			game_status = 0;

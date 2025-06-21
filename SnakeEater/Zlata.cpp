@@ -15,6 +15,44 @@ std::unique_ptr<sf::Sound> stepSound;
 sf::SoundBuffer hitSnakeBuff;
 std::unique_ptr<sf::Sound> hitSnakeSound;
 
+sf::SoundBuffer buttonClickBuff;
+std::unique_ptr<sf::Sound> buttonClickSound;
+
+sf::SoundBuffer antidoteBuff;
+std::unique_ptr<sf::Sound> antidoteSound;
+
+bool AntidoteSoundFunc() {
+    if (!antidoteBuff.loadFromFile("backMusic file/antidote_sound.ogg")) {
+        MessageBoxA(NULL, "Не вдалося завантажити файл antidote_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
+        return false;
+    }
+    antidoteSound = std::make_unique<sf::Sound>(antidoteBuff);
+    return true;
+}
+
+void PlayAntidoteSound() {
+    if (antidoteSound && antidoteSound->getStatus() != sf::SoundSource::Status::Playing) {
+        antidoteSound->setVolume(140);
+        antidoteSound->play();
+    }
+}
+
+bool ButtonClickSoundFunc() {
+    if (!buttonClickBuff.loadFromFile("backMusic file/click_sound.ogg")) {
+        MessageBoxA(NULL, "Не вдалося завантажити файл click_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
+        return false;
+    }
+    buttonClickSound = std::make_unique<sf::Sound>(buttonClickBuff);
+    return true;
+}
+
+void PlayButtonClickSound() {
+    if (buttonClickSound && buttonClickSound->getStatus() != sf::SoundSource::Status::Playing) {
+        buttonClickSound->setVolume(100);
+        buttonClickSound->play();
+    }
+}
+
 bool HitSnakeSound() {
     if (!hitSnakeBuff.loadFromFile("backMusic file/eat_snake_sound.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл eat_snake_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);

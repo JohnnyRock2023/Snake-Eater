@@ -15,8 +15,8 @@
 using namespace sf;
 using namespace std;
 
-#define SCREEN_RESX 1280
-#define SCREEN_RESY 720
+extern float SCREEN_RESX;
+extern float SCREEN_RESY;
 #define MAP_SIZEX 2500
 #define MAP_SIZEY 2000
 #define OBJECT_SIZE 30
@@ -30,12 +30,15 @@ using namespace std;
 #define MAX_SNAKE_SIZE 7
 #define SNAKE_SPEED 400
 #define SNAKE_MOVES 2
+#define NUM_OF_SNAKES 30
+#define NUM_OF_ADDITIONAL_SNAKES 10
 #define HIT_DELAY 500
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 90
 #define DEATH 10
 #define MIN_NUM_OF_ANTIDOTES 2
 #define MAX_NUM_OF_ANTIDOTES 4
+#define NUM_OF_ADDITIONAL_ANTIDOTES 2
 
 extern float playerPosX;
 extern float playerPosY;
@@ -93,6 +96,9 @@ public:
 		this->direction = direction;
 	};
 	~Snake() {
+		while (!body.empty()) {
+			body.pop_back();
+		}
 	};
 	int getSize() {
 		return size;
@@ -107,8 +113,10 @@ public:
 		return body;
 	}
 	void hitSnake() {
-		this->size -= 1;
-		this->body.pop_back();
+		if (!body.empty()) {
+			body.pop_back();
+			size = (short)body.size();
+		}
 	}
 };
 
@@ -149,6 +157,8 @@ extern Text* timeToDeath;
 
 extern Clock* poisonClock;
 
+extern View view;
+
 //FUNCTIONS
 
 //Kutsenko Roman
@@ -165,12 +175,13 @@ bool isObjectPosNew(float posX, float posY);
 bool isSnakePosNew(Vector2f pos);
 void snakeBite();
 void drawAntidotes(RenderWindow* window);
-void setAntidotesPos();
+void setAntidotesPos(int count);
 void useAntidote();
 void displayScore(RenderWindow* window);
 void displayTimeToDeath(RenderWindow* window);
 void restart();
 void isTheBest();
+bool isNearPlayer(float posX, float posY);
 
 //VikaK
 void handleZoom(View& view);

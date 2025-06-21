@@ -36,14 +36,14 @@ void showStartMenu(RenderWindow* window) {
 		// Натиск на кнопку старт
 		if (inRange(posForButtonX + mousePos.x, startButtonPosX, startButtonPosX + BUTTON_WIDTH) && inRange(posForButtonY + mousePos.y, startButtonPosY, startButtonPosY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
-			window->setTitle("Start!");
+			restart();
 			game_status = 1;
 		}
 		// Натиск на кнопку виходу
 		if (inRange(posForButtonX + mousePos.x, exitButtonPosX, exitButtonPosX + BUTTON_WIDTH) && inRange(posForButtonY + mousePos.y, exitButtonPosY, exitButtonPosY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
 			window->close();
-			window->setTitle("Exit!");
+			
 		}
 	}
 }
@@ -71,7 +71,7 @@ void showPauseMenu(RenderWindow* window) {
 
 	RectangleShape exitButton({ BUTTON_WIDTH, BUTTON_HEIGHT });
 	exitButton.setFillColor(Color::Red);
-    exitButton.setPosition({ pauseButtonX, menuButtonY });
+	exitButton.setPosition({ pauseButtonX, menuButtonY });
 	window->draw(titlePause);
 	window->draw(continueButton);
 	window->draw(restartButton);
@@ -97,7 +97,6 @@ void showPauseMenu(RenderWindow* window) {
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, restartButtonY, restartButtonY + BUTTON_HEIGHT)) {
-			window->setTitle("Restart clicked!");
 			PlayButtonClickSound();
 			restart();
 			game_status = 1;
@@ -105,7 +104,6 @@ void showPauseMenu(RenderWindow* window) {
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, menuButtonY, menuButtonY + BUTTON_HEIGHT)) {
-			window->setTitle("Menu clicked!");
 			PlayButtonClickSound();
 			restart();
 			StopTimerSound();
@@ -147,7 +145,6 @@ void showDeathScreen(RenderWindow* window) {
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, restartButtonY, restartButtonY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
-			window->setTitle("Restart clicked!");
 			restart();
 			game_status = 1;
 		}
@@ -155,7 +152,6 @@ void showDeathScreen(RenderWindow* window) {
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, menuButtonY, menuButtonY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
-			window->setTitle("Menu clicked!");
 			restart();
 			StopTimerSound();
 			game_status = 0;

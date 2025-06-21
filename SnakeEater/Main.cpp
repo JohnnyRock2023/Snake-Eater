@@ -5,6 +5,10 @@ int score = 0;
 int bestScore = 0;
 bool isPoisoned = false;
 
+float SCREEN_RESX = 1280;
+float SCREEN_RESY = 720;
+
+
 float timer = 0;
 float snakeTimer = 0;
 float attackTimer = 0;
@@ -61,6 +65,8 @@ short int playerDirection = 1;
 float viewPosX = (MAP_SIZEX / 2);
 float viewPosY = (MAP_SIZEY / 2);
 
+View view({ viewPosX, viewPosY }, { SCREEN_RESX, SCREEN_RESY });
+
 void renderingThread(RenderWindow* window)
 {
 	TimerSoundFunc();
@@ -71,12 +77,11 @@ void renderingThread(RenderWindow* window)
 	FootStepSound();
 	AudioTrack();
 	srand(time(NULL));
-	View view({ viewPosX, viewPosY }, { SCREEN_RESX, SCREEN_RESY });
 	window->setView(view);
 	window->setActive(true);
 	setObjectsPos();
-	setAntidotesPos();
-	spawnSnakes(30);
+	setAntidotesPos(MAX_NUM_OF_ANTIDOTES);
+	spawnSnakes(NUM_OF_SNAKES);
 
 	Clock clock;
 	Clock snakeClock;
@@ -188,6 +193,12 @@ void renderingThread(RenderWindow* window)
 
 			if (game_status == 1) {
 				window->draw(*PlayerSprite);
+				////////////////////////////////////////////////////////
+				if (snakes.size() <= 1) {
+					spawnSnakes(NUM_OF_ADDITIONAL_SNAKES);
+					setAntidotesPos(NUM_OF_ADDITIONAL_ANTIDOTES);
+				}
+				////////////////////////////////////////////////////////
 				if (!isPoisoned) {
 					snakeBite();
 				}
@@ -216,7 +227,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ContextSettings settings;
 	settings.antiAliasingLevel = 8;
 
-	RenderWindow window(VideoMode({ SCREEN_RESX, SCREEN_RESY }), "Snake Eater", State::Windowed, settings);
+	RenderWindow window(VideoMode({ (unsigned int)SCREEN_RESX, (unsigned int)SCREEN_RESY }), "Snake Eater", State::Windowed, settings);
 
 	window.setActive(false);
 	window.setFramerateLimit(120);
@@ -285,6 +296,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			if (event->is<Event::Closed>())
 				window.close();
+			if (event->is<Event::Resized>()) {
+				SCREEN_RESX = window.getSize().x;
+				SCREEN_RESY = window.getSize().y;
+				view.setSize({ SCREEN_RESX, SCREEN_RESY });
+			}
 		}
 	}
 	thread.join();

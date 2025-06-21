@@ -63,6 +63,14 @@ bool isSnakesPosNew(Vector2f pos) {
 	return true;
 }
 
+bool isNearPlayer(float posX, float posY) {
+	if (inRange(posX, playerPosX + PLAYER_SIZEX / 2 - OBJECT_SIZE * 2, playerPosX + PLAYER_SIZEX / 2 + OBJECT_SIZE * 2) &&
+		inRange(posY, playerPosY + PLAYER_SIZEY / 2 - OBJECT_SIZE * 2, playerPosY + PLAYER_SIZEY / 2 + OBJECT_SIZE * 2)) {
+		return true;
+	}
+	return false;
+}
+
 void spawnSnakes(int count) {
 	float posX;
 	float posY;
@@ -74,7 +82,7 @@ void spawnSnakes(int count) {
 		posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
 		posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
 
-		while (!isSnakesPosNew({ posX, posY })) {
+		while (!isSnakesPosNew({ posX, posY }) && !isNearPlayer(posX, posY)) {
 			posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
 			posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
 		}
@@ -108,29 +116,6 @@ void moveSnakes() {
 			if (moves == 0) {
 				direction = rand() % 4;
 				switch (direction) {
-					// Ver 1
-						/*case 0:
-							if (snakes[i].getDirect() == 1 || snakes[i].getDirect() == 0 || posY - OBJECT_SIZE < 0) {
-								j--;
-							}
-							break;
-						case 1:
-							if (snakes[i].getDirect() == 0 || snakes[i].getDirect() == 1 || posY + OBJECT_SIZE > MAP_SIZEY) {
-								j--;
-							}
-							break;
-						case 2:
-							if (snakes[i].getDirect() == 3 || snakes[i].getDirect() == 2 || posX - OBJECT_SIZE < 0) {
-								j--;
-							}
-							break;
-						case 3:
-							if (snakes[i].getDirect() == 2 || snakes[i].getDirect() == 3 || posX + OBJECT_SIZE > MAP_SIZEX) {
-								j--;
-							}
-							break;
-						}*/
-				// Ver 2
 				case 0:
 					if (snakes[i].getDirect() == 1 || posY - OBJECT_SIZE < 0) {
 						j--;
@@ -195,10 +180,10 @@ void drawSnakes(RenderWindow* window) {
 		size = snakes[i].getBody().size();
 		Angle headAngle;
 		switch (snakes[i].getBody()[0].bodyDirect) {
-			case 0: headAngle = degrees(0); break;
-			case 1: headAngle = degrees(180); break;
-			case 2: headAngle = degrees(270); break;
-			case 3: headAngle = degrees(90); break;
+		case 0: headAngle = degrees(0); break;
+		case 1: headAngle = degrees(180); break;
+		case 2: headAngle = degrees(270); break;
+		case 3: headAngle = degrees(90); break;
 		}
 		SnakeHeadSprite->setRotation(headAngle);
 		SnakeHeadSprite->setPosition(snakes[i].getBody()[0].pos);
@@ -239,14 +224,14 @@ void drawSnakes(RenderWindow* window) {
 			window->draw(*SnakeBodySprite);
 		}
 		Angle tailAngle;
-		switch (snakes[i].getBody()[size-2].bodyDirect) {
+		switch (snakes[i].getBody()[size - 2].bodyDirect) {
 		case 0: tailAngle = degrees(0); break;
 		case 1: tailAngle = degrees(180); break;
 		case 2: tailAngle = degrees(270); break;
 		case 3: tailAngle = degrees(90); break;
 		}
 		SnakeTailSprite->setRotation(tailAngle);
-		SnakeTailSprite->setPosition(snakes[i].getBody()[size-1].pos);
+		SnakeTailSprite->setPosition(snakes[i].getBody()[size - 1].pos);
 		window->draw(*SnakeTailSprite);
 	}
 }
@@ -260,12 +245,12 @@ void attackSnake(int playerDirect) {
 	for (int i = 0; i < snakes.size(); i++) {
 		for (int j = 0; j < snakes[i].getBody().size(); j++) {
 			snakePos = snakes[i].getBody()[j].pos;
-			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPosX + PLAYER_SIZEX/2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 2) && inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE*3)) {
+			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 2) && inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE * 3)) {
 				snakes[i].hitSnake();
 				score += 10;
 				PlayHitSnakeSound();
 			}
-			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPosX + PLAYER_SIZEX/2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE*3) && inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE )) {
+			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 3) && inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE)) {
 				snakes[i].hitSnake();
 				score += 10;
 				PlayHitSnakeSound();
@@ -275,18 +260,19 @@ void attackSnake(int playerDirect) {
 }
 
 void deleteSnakes() {
-	for (int i = 0; i < snakes.size(); i++) {
-		for (int j = 0; j < snakes[i].getSize(); j++) {
-			if (snakes[i].getBody().size() <= 2) {
-				snakes[i].getBody().clear();
-				snakes.erase(snakes.begin() + i);
-				score += 30;
-			}
+	for (size_t i = 0; i < snakes.size();) {
+		if (snakes[i].getBody().size() <= 2) {
+			score += 30;
+			snakes.erase(snakes.begin() + i);
+		}
+		else {
+			++i;
 		}
 	}
 }
 
-void drawGround(RenderWindow *window) {
+
+void drawGround(RenderWindow* window) {
 	for (float posX = 0; posX < MAP_SIZEX; posX += 100) {
 		for (float posY = 0; posY < MAP_SIZEY; posY += 100) {
 			GroundSprite->setPosition({ posX, posY });
@@ -309,7 +295,7 @@ void snakeBite() {
 	for (int i = 0; i < snakes.size(); i++) {
 		posX = snakes[i].getBody()[0].pos.x;
 		posY = snakes[i].getBody()[0].pos.y;
-		if (inRange(playerPosX + PLAYER_SIZEX/2, posX - OBJECT_SIZE, posX + OBJECT_SIZE*3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE, posY + OBJECT_SIZE *2)) {
+		if (inRange(playerPosX + PLAYER_SIZEX / 2, posX - OBJECT_SIZE, posX + OBJECT_SIZE * 3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE, posY + OBJECT_SIZE * 2)) {
 			isPoisoned = true;
 			poisonClock->restart();
 			PlaySnakeBiteSound();
@@ -317,15 +303,15 @@ void snakeBite() {
 		}
 	}
 }
-void setAntidotesPos() {
+void setAntidotesPos(int maxCount) {
 	float posX;
 	float posY;
-	int count = MIN_NUM_OF_ANTIDOTES + rand() % MAX_NUM_OF_ANTIDOTES;
+	int count = MIN_NUM_OF_ANTIDOTES + rand() % (maxCount - MIN_NUM_OF_ANTIDOTES + 1);
 	for (int i = 0; i < count; i++) {
 		posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
 		posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
 		if (isObjectPosNew(posX, posY)) {
-			antidotes.push_back({ posX + OBJECT_SIZE / 2, posY + OBJECT_SIZE / 2});
+			antidotes.push_back({ posX + OBJECT_SIZE / 2, posY + OBJECT_SIZE / 2 });
 		}
 		else
 			i--;
@@ -338,9 +324,10 @@ void drawAntidotes(RenderWindow* window) {
 	}
 
 }
-void useAntidote() {;
+void useAntidote() {
+	;
 	for (int i = 0; i < antidotes.size(); i++) {
-		if (inRange(playerPosX + PLAYER_SIZEX / 2, antidotes[i].x - OBJECT_SIZE / 2, antidotes[i].x + OBJECT_SIZE * 2) && inRange(playerPosY + PLAYER_SIZEY / 2, antidotes[i].y - OBJECT_SIZE/2 , antidotes[i].y + OBJECT_SIZE)) {
+		if (inRange(playerPosX + PLAYER_SIZEX / 2, antidotes[i].x - OBJECT_SIZE / 2, antidotes[i].x + OBJECT_SIZE * 2) && inRange(playerPosY + PLAYER_SIZEY / 2, antidotes[i].y - OBJECT_SIZE / 2, antidotes[i].y + OBJECT_SIZE)) {
 			PlayAntidoteSound();
 			isPoisoned = false;
 			poisonTimer = 0;
@@ -351,7 +338,7 @@ void useAntidote() {;
 }
 
 void displayScore(RenderWindow* window) {
-	textScore->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 , viewPosY - SCREEN_RESY / 2 + 50});
+	textScore->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 , viewPosY - SCREEN_RESY / 2 + 50 });
 	textScore->setString("SCORE: " + to_string(score));
 	textBestScore->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 , viewPosY - SCREEN_RESY / 2 + 15 });
 	textBestScore->setString("BEST SCORE: " + to_string(bestScore));
@@ -362,14 +349,16 @@ void displayScore(RenderWindow* window) {
 void displayTimeToDeath(RenderWindow* window) {
 	if (isPoisoned) {
 		timeToDeath->setPosition({ viewPosX - SCREEN_RESX / 2 + 300 , viewPosY - SCREEN_RESY / 2 + 15 });
+
 		float timeLeft = DEATH - poisonTimer;
-		if (timeLeft <= 5.0f) {
+		if (timeLeft <= 5.f) {
 			PlayTimerSound(1.7f);
 		}
 		else {
 			PlayTimerSound(1.0f);
 		}
-		timeToDeath->setFillColor(timeLeft < DEATH / 2 - 1 ? Color::Red : Color::Black);
+		//DEATH / 2 + 1
+		timeToDeath->setFillColor(timeLeft <= 6 ? Color::Red : Color::Black);
 		timeToDeath->setString(to_string((int)(DEATH - poisonTimer)));
 		window->draw(*timeToDeath);
 	}
@@ -392,8 +381,8 @@ void restart() {
 	viewPosX = (MAP_SIZEX / 2);
 	viewPosY = (MAP_SIZEY / 2);
 	setObjectsPos();
-	setAntidotesPos();
-	spawnSnakes(30);
+	setAntidotesPos(MAX_NUM_OF_ANTIDOTES);
+	spawnSnakes(NUM_OF_SNAKES);
 }
 
 void isTheBest() {

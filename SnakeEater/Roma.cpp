@@ -312,6 +312,7 @@ void snakeBite() {
 		if (inRange(playerPosX + PLAYER_SIZEX/2, posX - OBJECT_SIZE, posX + OBJECT_SIZE*3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE, posY + OBJECT_SIZE *2)) {
 			isPoisoned = true;
 			poisonClock->restart();
+			PlaySnakeBiteSound();
 		}
 	}
 }

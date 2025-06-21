@@ -21,6 +21,25 @@ std::unique_ptr<sf::Sound> buttonClickSound;
 sf::SoundBuffer antidoteBuff;
 std::unique_ptr<sf::Sound> antidoteSound;
 
+sf::SoundBuffer snakeBiteBuff;
+std::unique_ptr<sf::Sound> snakeBiteSound;
+
+bool SnakeBiteSoundFunc() {
+    if (!snakeBiteBuff.loadFromFile("backMusic file/bite_sound.ogg")) {
+        MessageBoxA(NULL, "Не вдалося завантажити файл bite_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
+        return false;
+    }
+    snakeBiteSound = std::make_unique<sf::Sound>(snakeBiteBuff);
+    return true;
+}
+
+void PlaySnakeBiteSound() {
+    if (snakeBiteSound && snakeBiteSound->getStatus() != sf::SoundSource::Status::Playing) {
+        snakeBiteSound->setVolume(80);
+        snakeBiteSound->play();
+    }
+}
+
 bool AntidoteSoundFunc() {
     if (!antidoteBuff.loadFromFile("backMusic file/antidote_sound.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл antidote_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);

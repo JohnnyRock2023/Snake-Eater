@@ -185,6 +185,8 @@ bool ButtonClickSoundFunc();
 void PlayButtonClickSound();
 bool AntidoteSoundFunc();
 void PlayAntidoteSound();
+bool SnakeBiteSoundFunc();
+void PlaySnakeBiteSound();
 
 //Vika Pavlenko
 void showStartMenu(RenderWindow* window);

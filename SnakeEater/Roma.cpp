@@ -348,9 +348,12 @@ void useAntidote() {;
 }
 
 void displayScore(RenderWindow* window) {
-	textScore->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 , viewPosY - SCREEN_RESY / 2 + 15});
+	textScore->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 , viewPosY - SCREEN_RESY / 2 + 50});
 	textScore->setString("SCORE: " + to_string(score));
+	textBestScore->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 , viewPosY - SCREEN_RESY / 2 + 15 });
+	textBestScore->setString("BEST SCORE: " + to_string(bestScore));
 	window->draw(*textScore);
+	window->draw(*textBestScore);
 }
 
 void displayTimeToDeath(RenderWindow* window) {
@@ -368,6 +371,7 @@ void displayTimeToDeath(RenderWindow* window) {
 }
 
 void restart() {
+	isTheBest();
 	for (int i = 0; i < snakes.size(); i++) {
 		snakes[i].getBody().clear();
 	}
@@ -385,4 +389,10 @@ void restart() {
 	setObjectsPos();
 	setAntidotesPos();
 	spawnSnakes(30);
+}
+
+void isTheBest() {
+	if (score > bestScore) {
+		bestScore = score;
+	}
 }

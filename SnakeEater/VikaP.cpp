@@ -104,6 +104,7 @@ void showPauseMenu(RenderWindow* window) {
 			window->setTitle("Menu clicked!");
 			restart();
 			game_status = 0;
+			pauseTimer = 0;
 		}
 	}
 }

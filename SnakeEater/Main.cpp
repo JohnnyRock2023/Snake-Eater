@@ -8,15 +8,12 @@ bool isPoisoned = false;
 float SCREEN_RESX = 1280;
 float SCREEN_RESY = 720;
 
-
 float timer = 0;
 float snakeTimer = 0;
 float attackTimer = 0;
 float poisonTimer = 0;
 float pauseTimer = 0;
 
-
-// Objects
 vector<Object> objects;
 vector<Snake> snakes;
 vector<Vector2f> antidotes;
@@ -38,7 +35,13 @@ Texture StumpTexture;
 Texture GroundTexture;
 Texture StartButtonTexture;
 Texture ExitButtonTexture;
+Texture ContinueButtonTexture;
+Texture RestartButtonTexture;
+Texture MenuButtonTexture;
+Texture LogoTexture;
+Texture GameOverTexture;
 Texture AntidoteTexture;
+Texture ScullTexture;
 
 Text* textScore = nullptr;
 Text* textBestScore = nullptr;
@@ -55,13 +58,19 @@ Sprite* SnakeTailSprite = nullptr;
 Sprite* GroundSprite = nullptr;
 Sprite* StartButtonSprite = nullptr;
 Sprite* ExitButtonSprite = nullptr;
+Sprite* ContinueButtonSprite = nullptr;
+Sprite* RestartButtonSprite = nullptr;
+Sprite* MenuButtonSprite = nullptr;
+Sprite* LogoSprite = nullptr;
+Sprite* GameOverSprite = nullptr;
 Sprite* AntidoteSprite = nullptr;
+Sprite* ScullSprite = nullptr;
 
 Clock* poisonClock = nullptr;
 
+short int playerDirection = 1;
 float playerPosX = (MAP_SIZEX / 2);
 float playerPosY = (MAP_SIZEY / 2);
-short int playerDirection = 1;
 float viewPosX = (MAP_SIZEX / 2);
 float viewPosY = (MAP_SIZEY / 2);
 
@@ -206,8 +215,10 @@ void renderingThread(RenderWindow* window)
 					useAntidote();
 				}
 			}
-			displayScore(window);
-			displayTimeToDeath(window);
+			if (game_status == 1 || game_status == 2) {
+				displayScore(window);
+				displayTimeToDeath(window);
+			}
 		}
 		if (game_status == 0) {
 			showStartMenu(window);
@@ -252,7 +263,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!GroundTexture.loadFromFile("Images/Overworld.png", false)) {}
 	if (!StartButtonTexture.loadFromFile("Images/Play.png", false)) {}
 	if (!ExitButtonTexture.loadFromFile("Images/Quit.png", false)) {}
+	if (!ContinueButtonTexture.loadFromFile("Images/Continue.png", false)) {}
+	if (!RestartButtonTexture.loadFromFile("Images/Restart.png", false)) {}
+	if (!MenuButtonTexture.loadFromFile("Images/Menu.png", false)) {}
+	if (!LogoTexture.loadFromFile("Images/Logo.png", false)) {}
+	if (!GameOverTexture.loadFromFile("Images/GameOver.png", false)) {}
+	if (!ExitButtonTexture.loadFromFile("Images/Quit.png", false)) {}
 	if (!AntidoteTexture.loadFromFile("Images/Antidote.png", false)) {}
+	if (!ScullTexture.loadFromFile("Images/Scull.png", false)) {}
 
 	Font font;
 	if (!font.openFromFile("Fonts/Arial.ttf")) {}
@@ -279,7 +297,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	GroundSprite = new Sprite(GroundTexture);
 	StartButtonSprite = new Sprite(StartButtonTexture);
 	ExitButtonSprite = new Sprite(ExitButtonTexture);
+	ContinueButtonSprite = new Sprite(ContinueButtonTexture);
+	RestartButtonSprite = new Sprite(RestartButtonTexture);
+	MenuButtonSprite = new Sprite(MenuButtonTexture);
+	LogoSprite = new Sprite(LogoTexture);
+	GameOverSprite = new Sprite(GameOverTexture);
 	AntidoteSprite = new Sprite(AntidoteTexture);
+	ScullSprite = new Sprite(ScullTexture);
 
 
 	SnakeBodySprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
@@ -287,8 +311,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SnakeTailSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
 	PlayerSprite->setOrigin({ PLAYER_SIZEX / 2, PLAYER_SIZEY / 2 });
 	AntidoteSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
+	ScullSprite->setOrigin({ (float)ScullTexture.getSize().x/2, (float)ScullTexture.getSize().y / 2 });
 
-	thread thread(&renderingThread, &window);
+	std::thread thread(&renderingThread, &window);
 
 	while (window.isOpen())
 	{

@@ -245,12 +245,14 @@ void attackSnake(int playerDirect) {
 	for (int i = 0; i < snakes.size(); i++) {
 		for (int j = 0; j < snakes[i].getBody().size(); j++) {
 			snakePos = snakes[i].getBody()[j].pos;
-			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 2) && inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE * 3)) {
+			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 2) && 
+				inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE * 3)) {
 				snakes[i].hitSnake();
 				score += 10;
 				PlayHitSnakeSound();
 			}
-			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 3) && inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE)) {
+			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 3) && 
+				inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE)) {
 				snakes[i].hitSnake();
 				score += 10;
 				PlayHitSnakeSound();
@@ -295,7 +297,8 @@ void snakeBite() {
 	for (int i = 0; i < snakes.size(); i++) {
 		posX = snakes[i].getBody()[0].pos.x;
 		posY = snakes[i].getBody()[0].pos.y;
-		if (inRange(playerPosX + PLAYER_SIZEX / 2, posX - OBJECT_SIZE, posX + OBJECT_SIZE * 3) && inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE, posY + OBJECT_SIZE * 2)) {
+		if (inRange(playerPosX + PLAYER_SIZEX / 2, posX - OBJECT_SIZE, posX + OBJECT_SIZE * 3) && 
+			inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE, posY + OBJECT_SIZE * 2)) {
 			isPoisoned = true;
 			poisonClock->restart();
 			PlaySnakeBiteSound();
@@ -327,7 +330,8 @@ void drawAntidotes(RenderWindow* window) {
 void useAntidote() {
 	;
 	for (int i = 0; i < antidotes.size(); i++) {
-		if (inRange(playerPosX + PLAYER_SIZEX / 2, antidotes[i].x - OBJECT_SIZE / 2, antidotes[i].x + OBJECT_SIZE * 2) && inRange(playerPosY + PLAYER_SIZEY / 2, antidotes[i].y - OBJECT_SIZE / 2, antidotes[i].y + OBJECT_SIZE)) {
+		if (inRange(playerPosX + PLAYER_SIZEX / 2, antidotes[i].x - OBJECT_SIZE / 2, antidotes[i].x + OBJECT_SIZE * 2) && 
+			inRange(playerPosY + PLAYER_SIZEY / 2, antidotes[i].y - OBJECT_SIZE / 2, antidotes[i].y + OBJECT_SIZE)) {
 			PlayAntidoteSound();
 			isPoisoned = false;
 			poisonTimer = 0;
@@ -348,10 +352,13 @@ void displayScore(RenderWindow* window) {
 
 void displayTimeToDeath(RenderWindow* window) {
 	if (isPoisoned) {
-		timeToDeath->setPosition({ viewPosX - SCREEN_RESX / 2 + 300 , viewPosY - SCREEN_RESY / 2 + 15 });
-
+		timeToDeath->setOrigin({ timeToDeath->getLocalBounds().getCenter().x, 0 });
+		ScullSprite->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 + ScullTexture.getSize().x/2, viewPosY - SCREEN_RESY / 2 + 120});
+		timeToDeath->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 + ScullTexture.getSize().x/2,
+			                       viewPosY - SCREEN_RESY / 2 + ScullTexture.getSize().y + 120});
+		
 		float timeLeft = DEATH - poisonTimer;
-		if (timeLeft <= 5.f) {
+		if (timeLeft <= 6.f) {
 			PlayTimerSound(1.7f);
 		}
 		else {
@@ -361,6 +368,7 @@ void displayTimeToDeath(RenderWindow* window) {
 		timeToDeath->setFillColor(timeLeft <= 6 ? Color::Red : Color::Black);
 		timeToDeath->setString(to_string((int)(DEATH - poisonTimer)));
 		window->draw(*timeToDeath);
+		window->draw(*ScullSprite);
 	}
 }
 

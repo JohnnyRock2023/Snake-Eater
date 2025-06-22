@@ -135,7 +135,13 @@ extern Sprite* SnakeTailSprite;
 extern Sprite* GroundSprite;
 extern Sprite* StartButtonSprite;
 extern Sprite* ExitButtonSprite;
+extern Sprite* ContinueButtonSprite;
+extern Sprite* RestartButtonSprite;
+extern Sprite* MenuButtonSprite;
+extern Sprite* LogoSprite;
+extern Sprite* GameOverSprite;
 extern Sprite* AntidoteSprite;
+extern Sprite* ScullSprite;
 
 extern Texture PlayerFrontTexture;
 extern Texture RockLTexture;
@@ -149,6 +155,12 @@ extern Texture SnakeTailTexture;
 extern Texture GroundTexture;
 extern Texture StartButtonTexture;
 extern Texture ExitButtonTexture;
+extern Texture ContinueButtonTexture;
+extern Texture RestartButtonTexture;
+extern Texture MenuButtonTexture;
+extern Texture LogoTexture;
+extern Texture GameOverTexture;
+extern Texture ScullTexture;
 extern Texture AntidoteTexture;
 
 extern Text* textScore;

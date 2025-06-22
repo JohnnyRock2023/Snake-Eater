@@ -219,6 +219,10 @@ extern sf::Music deathMusic;
 bool DeathMusicFunc();
 void PlayDeathMusic();
 void StopDeathMusic();
+extern sf::Music menuMusic;
+bool MenuMusicFunc();
+void PlayMenuMusic();
+void StopMenuMusic();
 
 //Vika Pavlenko
 void showStartMenu(RenderWindow* window);

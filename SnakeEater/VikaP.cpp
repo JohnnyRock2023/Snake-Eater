@@ -13,6 +13,12 @@ float menuButtonY = viewPosY + 100;
 
 void showStartMenu(RenderWindow* window) {
 
+	static bool menuPl = false;
+	if (!menuPl) {
+		PlayMenuMusic();
+		menuPl = true;
+	}
+
 	posForButtonX = viewPosX - SCREEN_RESX / 2;
 	posForButtonY = viewPosY - SCREEN_RESY / 2;
 	startButtonPosX = viewPosX - BUTTON_WIDTH / 2;
@@ -35,8 +41,11 @@ void showStartMenu(RenderWindow* window) {
 		if (inRange(posForButtonX + mousePos.x, startButtonPosX, startButtonPosX + BUTTON_WIDTH) && 
 			inRange(posForButtonY + mousePos.y, startButtonPosY, startButtonPosY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
+			StopMenuMusic();
+			AudioTrack();
 			restart();
 			game_status = 1;
+			menuPl = false;
 		}
 		// Натиск на кнопку виходу
 		if (inRange(posForButtonX + mousePos.x, exitButtonPosX, exitButtonPosX + BUTTON_WIDTH) && 
@@ -83,6 +92,7 @@ void showPauseMenu(RenderWindow* window) {
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, continueButtonY, continueButtonY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
+			restoreMusic();
 			poisonClock->restart();
 			game_status = 1;
 		}
@@ -153,7 +163,7 @@ void showDeathScreen(RenderWindow* window) {
 			inRange(mouseY, menuButtonY, menuButtonY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
 			StopDeathMusic();
-			AudioTrack();
+			PlayMenuMusic();
 			restart();
 			StopTimerSound();
 			game_status = 0;

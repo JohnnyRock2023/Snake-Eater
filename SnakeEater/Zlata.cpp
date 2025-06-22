@@ -29,13 +29,36 @@ std::unique_ptr<sf::Sound> timerSound;
 
 sf::Music deathMusic;
 
+sf::Music menuMusic;
+
+bool MenuMusicFunc() {
+    if (!menuMusic.openFromFile("backMusic file/menu_music.ogg")) {
+        MessageBoxA(NULL, "Не вдалося завантажити файл menu_music.ogg", "Помилка", MB_OK | MB_ICONERROR);
+        return false;
+    }
+    menuMusic.setLooping(true);
+    menuMusic.setPitch(0.9f);
+    menuMusic.setVolume(10);
+    return true;
+}
+
+void PlayMenuMusic() {
+    backMusic.stop();
+    deathMusic.stop();
+    menuMusic.play();
+}
+
+void StopMenuMusic() {
+    menuMusic.stop();
+}
+
 bool DeathMusicFunc() {
     if (!deathMusic.openFromFile("backMusic file/fail_music.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл fail_music.ogg", "Помилка", MB_OK | MB_ICONERROR);
         return false;
     }
     deathMusic.setLooping(false);
-    deathMusic.setVolume(45);
+    deathMusic.setVolume(35);
     return true;
 }
 

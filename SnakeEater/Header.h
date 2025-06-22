@@ -141,7 +141,7 @@ extern Sprite* MenuButtonSprite;
 extern Sprite* LogoSprite;
 extern Sprite* GameOverSprite;
 extern Sprite* AntidoteSprite;
-extern Sprite* ScullSprite;
+extern Sprite* SkullSprite;
 
 extern Texture PlayerFrontTexture;
 extern Texture RockLTexture;
@@ -160,7 +160,7 @@ extern Texture RestartButtonTexture;
 extern Texture MenuButtonTexture;
 extern Texture LogoTexture;
 extern Texture GameOverTexture;
-extern Texture ScullTexture;
+extern Texture SkullTexture;
 extern Texture AntidoteTexture;
 
 extern Text* textScore;

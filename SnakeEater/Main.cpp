@@ -41,7 +41,7 @@ Texture MenuButtonTexture;
 Texture LogoTexture;
 Texture GameOverTexture;
 Texture AntidoteTexture;
-Texture ScullTexture;
+Texture SkullTexture;
 
 Text* textScore = nullptr;
 Text* textBestScore = nullptr;
@@ -64,7 +64,7 @@ Sprite* MenuButtonSprite = nullptr;
 Sprite* LogoSprite = nullptr;
 Sprite* GameOverSprite = nullptr;
 Sprite* AntidoteSprite = nullptr;
-Sprite* ScullSprite = nullptr;
+Sprite* SkullSprite = nullptr;
 
 Clock* poisonClock = nullptr;
 
@@ -262,15 +262,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!StumpTexture.loadFromFile("Images/Stump.png", false)) {}
 	if (!GroundTexture.loadFromFile("Images/Overworld.png", false)) {}
 	if (!StartButtonTexture.loadFromFile("Images/Play.png", false)) {}
-	if (!ExitButtonTexture.loadFromFile("Images/Quit.png", false)) {}
+	if (!ExitButtonTexture.loadFromFile("Images/Exit.png", false)) {}
 	if (!ContinueButtonTexture.loadFromFile("Images/Continue.png", false)) {}
 	if (!RestartButtonTexture.loadFromFile("Images/Restart.png", false)) {}
 	if (!MenuButtonTexture.loadFromFile("Images/Menu.png", false)) {}
 	if (!LogoTexture.loadFromFile("Images/Logo.png", false)) {}
 	if (!GameOverTexture.loadFromFile("Images/GameOver.png", false)) {}
-	if (!ExitButtonTexture.loadFromFile("Images/Quit.png", false)) {}
 	if (!AntidoteTexture.loadFromFile("Images/Antidote.png", false)) {}
-	if (!ScullTexture.loadFromFile("Images/Scull.png", false)) {}
+	if (!SkullTexture.loadFromFile("Images/Skull.png", false)) {}
 
 	Font font;
 	if (!font.openFromFile("Fonts/Arial.ttf")) {}
@@ -303,7 +302,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LogoSprite = new Sprite(LogoTexture);
 	GameOverSprite = new Sprite(GameOverTexture);
 	AntidoteSprite = new Sprite(AntidoteTexture);
-	ScullSprite = new Sprite(ScullTexture);
+	SkullSprite = new Sprite(SkullTexture);
 
 
 	SnakeBodySprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
@@ -311,7 +310,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SnakeTailSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
 	PlayerSprite->setOrigin({ PLAYER_SIZEX / 2, PLAYER_SIZEY / 2 });
 	AntidoteSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
-	ScullSprite->setOrigin({ (float)ScullTexture.getSize().x/2, (float)ScullTexture.getSize().y / 2 });
+	SkullSprite->setOrigin({ (float)SkullTexture.getSize().x/2, (float)SkullTexture.getSize().y / 2 });
 
 	std::thread thread(&renderingThread, &window);
 

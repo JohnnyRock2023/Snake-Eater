@@ -23,7 +23,7 @@ void showStartMenu(RenderWindow* window) {
 	StartButtonSprite->setPosition({ startButtonPosX, startButtonPosY });
 	ExitButtonSprite->setPosition({ exitButtonPosX, exitButtonPosY });
 
-	LogoSprite->setPosition({ viewPosX - LogoTexture.getSize().x / 2,  viewPosY - 300 });
+	LogoSprite->setPosition({ viewPosX - LogoTexture.getSize().x / 2,  viewPosY - 250 });
 
 	window->draw(*LogoSprite);
 	window->draw(*StartButtonSprite);
@@ -109,16 +109,18 @@ void showDeathScreen(RenderWindow* window) {
 	posForButtonX = viewPosX - SCREEN_RESX / 2;
 	posForButtonY = viewPosY - SCREEN_RESY / 2;
 	pauseButtonX = viewPosX - BUTTON_WIDTH / 2;
-	restartButtonY = viewPosY + 20;
-	menuButtonY = viewPosY + 130;
+	restartButtonY = viewPosY + 50;
+	menuButtonY = viewPosY + 160;
 
-	GameOverSprite->setPosition({ viewPosX - 250.f, viewPosY - 250.f });
+	GameOverSprite->setPosition({ viewPosX - 350.f, viewPosY - 270.f });
+	SkullSprite->setPosition({ viewPosX,  viewPosY - 60 });
 	RestartButtonSprite->setPosition({ pauseButtonX, restartButtonY });
 	MenuButtonSprite->setPosition({ pauseButtonX, menuButtonY });
-	textScore->setPosition({ viewPosX - textScore->getLocalBounds().getCenter().x, viewPosY - 40 });
+	textScore->setPosition({ viewPosX - textScore->getLocalBounds().getCenter().x, viewPosY - 10 });
 	textScore->setString("YOUR SCORE: " + to_string(score));
 
 	window->draw(*GameOverSprite);
+	window->draw(*SkullSprite);
 	window->draw(*textScore);
 	window->draw(*RestartButtonSprite);
 	window->draw(*MenuButtonSprite);

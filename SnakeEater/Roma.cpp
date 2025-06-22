@@ -64,8 +64,8 @@ bool isSnakesPosNew(Vector2f pos) {
 }
 
 bool isNearPlayer(float posX, float posY) {
-	if (inRange(posX, playerPosX + PLAYER_SIZEX / 2 - OBJECT_SIZE * 2, playerPosX + PLAYER_SIZEX / 2 + OBJECT_SIZE * 2) &&
-		inRange(posY, playerPosY + PLAYER_SIZEY / 2 - OBJECT_SIZE * 2, playerPosY + PLAYER_SIZEY / 2 + OBJECT_SIZE * 2)) {
+	if (inRange(posX, playerPosX + PLAYER_SIZEX / 2 - OBJECT_SIZE * 4, playerPosX + PLAYER_SIZEX / 2 + OBJECT_SIZE * 4) &&
+		inRange(posY, playerPosY + PLAYER_SIZEY / 2 - OBJECT_SIZE * 4, playerPosY + PLAYER_SIZEY / 2 + OBJECT_SIZE * 4)) {
 		return true;
 	}
 	return false;
@@ -82,7 +82,7 @@ void spawnSnakes(int count) {
 		posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
 		posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
 
-		while (!isSnakesPosNew({ posX, posY }) && !isNearPlayer(posX, posY)) {
+		while (!isSnakesPosNew({ posX, posY }) || isNearPlayer(posX, posY)) {
 			posX = (float)(rand() % (MAP_SIZEX / OBJECT_SIZE)) * OBJECT_SIZE;
 			posY = (float)(rand() % (MAP_SIZEY / OBJECT_SIZE)) * OBJECT_SIZE;
 		}
@@ -353,9 +353,9 @@ void displayScore(RenderWindow* window) {
 void displayTimeToDeath(RenderWindow* window) {
 	if (isPoisoned) {
 		timeToDeath->setOrigin({ timeToDeath->getLocalBounds().getCenter().x, 0 });
-		ScullSprite->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 + ScullTexture.getSize().x/2, viewPosY - SCREEN_RESY / 2 + 120});
-		timeToDeath->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 + ScullTexture.getSize().x/2,
-			                       viewPosY - SCREEN_RESY / 2 + ScullTexture.getSize().y + 120});
+		SkullSprite->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 + SkullTexture.getSize().x/2, viewPosY - SCREEN_RESY / 2 + 135});
+		timeToDeath->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 + SkullTexture.getSize().x/2,
+			                       viewPosY - SCREEN_RESY / 2 + SkullTexture.getSize().y + 100});
 		
 		float timeLeft = DEATH - poisonTimer;
 		if (timeLeft <= 6.f) {
@@ -368,7 +368,7 @@ void displayTimeToDeath(RenderWindow* window) {
 		timeToDeath->setFillColor(timeLeft <= 6 ? Color::Red : Color::Black);
 		timeToDeath->setString(to_string((int)(DEATH - poisonTimer)));
 		window->draw(*timeToDeath);
-		window->draw(*ScullSprite);
+		window->draw(*SkullSprite);
 	}
 }
 

@@ -78,6 +78,7 @@ View view({ viewPosX, viewPosY }, { SCREEN_RESX, SCREEN_RESY });
 
 void renderingThread(RenderWindow* window)
 {
+	DeathMusicFunc();
 	TimerSoundFunc();
 	SnakeBiteSoundFunc();
 	AntidoteSoundFunc();

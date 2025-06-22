@@ -50,6 +50,7 @@ void showStartMenu(RenderWindow* window) {
 
 void showPauseMenu(RenderWindow* window) {
 
+	lowerMusic();
 	posForButtonX = viewPosX - SCREEN_RESX / 2;
 	posForButtonY = viewPosY - SCREEN_RESY / 2;
 	pauseButtonX = viewPosX - BUTTON_WIDTH / 2;
@@ -68,6 +69,7 @@ void showPauseMenu(RenderWindow* window) {
 	window->draw(*MenuButtonSprite);
 
 	if (pauseTimer > 300 && Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
+		restoreMusic();
 		game_status = 1;
 		pauseTimer = 0;
 		poisonClock->restart();
@@ -88,6 +90,7 @@ void showPauseMenu(RenderWindow* window) {
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, restartButtonY, restartButtonY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
+			restoreMusic();
 			restart();
 			game_status = 1;
 		}
@@ -104,6 +107,12 @@ void showPauseMenu(RenderWindow* window) {
 }
 
 void showDeathScreen(RenderWindow* window) {
+
+	static bool failMusic = false;
+	if (!failMusic) {
+		PlayDeathMusic();
+		failMusic = true;
+	}
 
 	StopTimerSound();
 	posForButtonX = viewPosX - SCREEN_RESX / 2;
@@ -133,17 +142,23 @@ void showDeathScreen(RenderWindow* window) {
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, restartButtonY, restartButtonY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
+			StopDeathMusic();
+			AudioTrack();
 			restart();
 			game_status = 1;
+			failMusic = false;
 		}
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, menuButtonY, menuButtonY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
+			StopDeathMusic();
+			AudioTrack();
 			restart();
 			StopTimerSound();
 			game_status = 0;
 			pauseTimer = 0;
+			failMusic = false;
 		}
 	}
 }

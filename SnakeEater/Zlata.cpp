@@ -27,6 +27,29 @@ std::unique_ptr<sf::Sound> snakeBiteSound;
 sf::SoundBuffer timerBuff;
 std::unique_ptr<sf::Sound> timerSound;
 
+sf::Music deathMusic;
+
+bool DeathMusicFunc() {
+    if (!deathMusic.openFromFile("backMusic file/fail_music.ogg")) {
+        MessageBoxA(NULL, "Не вдалося завантажити файл fail_music.ogg", "Помилка", MB_OK | MB_ICONERROR);
+        return false;
+    }
+    deathMusic.setLooping(false);
+    deathMusic.setVolume(45);
+    return true;
+}
+
+void PlayDeathMusic() {
+    backMusic.setVolume(0);
+    backMusic.stop();
+    deathMusic.stop();
+    deathMusic.play();
+}
+
+void StopDeathMusic() {
+    deathMusic.stop();
+}
+
 bool TimerSoundFunc() {
     if (!timerBuff.loadFromFile("backMusic file/oclock_sound.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл oclock_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
@@ -146,4 +169,12 @@ void updateMusicLoop() {
     if (backMusic.getStatus() == sf::SoundSource::Status::Stopped) {
         backMusic.play();
     }
+}
+
+void lowerMusic(float tgVolume) {
+    backMusic.setVolume(tgVolume);
+}
+
+void restoreMusic(float defaultVolume) {
+    backMusic.setVolume(defaultVolume);
 }

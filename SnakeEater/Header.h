@@ -213,6 +213,12 @@ void PlaySnakeBiteSound();
 bool TimerSoundFunc();
 void PlayTimerSound(float speed = 1.0f);
 void StopTimerSound();
+void lowerMusic(float tgVolume = 20.0f);
+void restoreMusic(float defaultVolume = 45.0f);
+extern sf::Music deathMusic;
+bool DeathMusicFunc();
+void PlayDeathMusic();
+void StopDeathMusic();
 
 //Vika Pavlenko
 void showStartMenu(RenderWindow* window);

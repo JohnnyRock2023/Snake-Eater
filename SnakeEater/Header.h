@@ -27,7 +27,7 @@ extern float SCREEN_RESY;
 #define STEP 5
 #define SPEED 12   // < 10 - Faster; > 10 - Slower
 #define MIN_SNAKE_SIZE 4
-#define MAX_SNAKE_SIZE 7
+#define MAX_SNAKE_SIZE 9
 #define SNAKE_SPEED 400
 #define SNAKE_MOVES 2
 #define NUM_OF_SNAKES 30
@@ -35,9 +35,9 @@ extern float SCREEN_RESY;
 #define HIT_DELAY 500
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 90
-#define DEATH 10
-#define MIN_NUM_OF_ANTIDOTES 2
-#define MAX_NUM_OF_ANTIDOTES 4
+#define DEATH 15
+#define MIN_NUM_OF_ANTIDOTES 4
+#define MAX_NUM_OF_ANTIDOTES 6
 #define NUM_OF_ADDITIONAL_ANTIDOTES 2
 
 extern float playerPosX;

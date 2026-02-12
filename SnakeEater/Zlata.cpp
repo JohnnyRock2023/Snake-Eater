@@ -32,7 +32,7 @@ sf::Music deathMusic;
 sf::Music menuMusic;
 
 bool MenuMusicFunc() {
-    if (!menuMusic.openFromFile("backMusic file/menu_music.ogg")) {
+    if (!menuMusic.openFromFile("backMusicfile/menu_music.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл menu_music.ogg", "Помилка", MB_OK | MB_ICONERROR);
         return false;
     }
@@ -53,7 +53,7 @@ void StopMenuMusic() {
 }
 
 bool DeathMusicFunc() {
-    if (!deathMusic.openFromFile("backMusic file/fail_music.ogg")) {
+    if (!deathMusic.openFromFile("backMusicfile/fail_music.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл fail_music.ogg", "Помилка", MB_OK | MB_ICONERROR);
         return false;
     }
@@ -74,7 +74,7 @@ void StopDeathMusic() {
 }
 
 bool TimerSoundFunc() {
-    if (!timerBuff.loadFromFile("backMusic file/oclock_sound.ogg")) {
+    if (!timerBuff.loadFromFile("backMusicfile/oclock_sound.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл oclock_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
         return false;
     }
@@ -98,7 +98,7 @@ void StopTimerSound() {
 }
 
 bool SnakeBiteSoundFunc() {
-    if (!snakeBiteBuff.loadFromFile("backMusic file/bite_sound.ogg")) {
+    if (!snakeBiteBuff.loadFromFile("backMusicfile/bite_sound.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл bite_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
         return false;
     }
@@ -114,7 +114,7 @@ void PlaySnakeBiteSound() {
 }
 
 bool AntidoteSoundFunc() {
-    if (!antidoteBuff.loadFromFile("backMusic file/antidote_sound.ogg")) {
+    if (!antidoteBuff.loadFromFile("backMusicfile/antidote_sound.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл antidote_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
         return false;
     }
@@ -130,7 +130,7 @@ void PlayAntidoteSound() {
 }
 
 bool ButtonClickSoundFunc() {
-    if (!buttonClickBuff.loadFromFile("backMusic file/click_sound.ogg")) {
+    if (!buttonClickBuff.loadFromFile("backMusicfile/click_sound.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл click_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
         return false;
     }
@@ -146,7 +146,7 @@ void PlayButtonClickSound() {
 }
 
 bool HitSnakeSound() {
-    if (!hitSnakeBuff.loadFromFile("backMusic file/eat_snake_sound.ogg")) {
+    if (!hitSnakeBuff.loadFromFile("backMusicfile/eat_snake_sound.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл eat_snake_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
         return false;
     }
@@ -162,7 +162,7 @@ void PlayHitSnakeSound() {
 }
 
 bool FootStepSound() {
-    if (!stepBuff.loadFromFile("backMusic file/footstep_sound.ogg")) {
+    if (!stepBuff.loadFromFile("backMusicfile/footstep_sound.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл foot_step_sound.ogg", "Помилка", MB_OK | MB_ICONERROR);
         return false;
     }
@@ -178,7 +178,7 @@ void PlayFootStepSound() {
 }
 
 void AudioTrack() {
-    if (!backMusic.openFromFile("backMusic file/music_for_project.ogg")) {
+    if (!backMusic.openFromFile("backMusicfile/music_for_project.ogg")) {
         MessageBoxA(NULL, "Не вдалося завантажити файл music_for_project.ogg", "Помилка", MB_OK | MB_ICONERROR);
         return;
     }

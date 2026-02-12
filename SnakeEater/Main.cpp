@@ -1,6 +1,7 @@
 #include "Header.h"
 
 int game_status = 0;
+int coop_mode = 1;
 int score = 0;
 int bestScore = 0;
 bool isPoisoned = false;
@@ -74,6 +75,10 @@ float playerPosY = (MAP_SIZEY / 2);
 float viewPosX = (MAP_SIZEX / 2);
 float viewPosY = (MAP_SIZEY / 2);
 
+void test() {
+	int i = 0;
+}
+
 View view({ viewPosX, viewPosY }, { SCREEN_RESX, SCREEN_RESY });
 
 void renderingThread(RenderWindow* window)
@@ -93,6 +98,18 @@ void renderingThread(RenderWindow* window)
 	setObjectsPos();
 	setAntidotesPos(MAX_NUM_OF_ANTIDOTES);
 	spawnSnakes(NUM_OF_SNAKES);
+
+	/*std::thread syncThread;
+
+	if (coop_mode) {
+		coop_mode == 1 ? createServer() : connectToServer();
+		try {
+			syncThread = std::thread(&syncData);
+		}
+		catch (...) {
+			MessageBoxA(NULL, "Не вдалося створити потік синхронізації даних", "Помилка", MB_OK | MB_ICONERROR);
+		}
+	}*/
 
 	Clock clock;
 	Clock snakeClock;
@@ -184,6 +201,7 @@ void renderingThread(RenderWindow* window)
 				game_status = 3;
 			}
 		}
+
 		if (game_status == 1 || game_status == 0 || game_status == 3) {
 			float snakeTime = snakeClock.getElapsedTime().asMilliseconds();
 			snakeClock.restart();
@@ -193,6 +211,10 @@ void renderingThread(RenderWindow* window)
 				snakeTimer = 0;
 				moveSnakes();
 			}
+
+			//createSendPackage();
+			//getRecvPackage();
+
 			handleZoom(view);
 			view.setCenter({ viewPosX, viewPosY });
 			window->setView(view);
@@ -201,6 +223,8 @@ void renderingThread(RenderWindow* window)
 			drawAntidotes(window);
 			deleteSnakes();
 			drawSnakes(window);
+
+		
 
 			if (game_status == 1) {
 				window->draw(*PlayerSprite);
@@ -233,8 +257,10 @@ void renderingThread(RenderWindow* window)
 		}
 		window->display();
 	}
+	/*if (coop_mode) {
+		syncThread.join();
+	}*/
 }
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	ContextSettings settings;
@@ -312,7 +338,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SnakeTailSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
 	PlayerSprite->setOrigin({ PLAYER_SIZEX / 2, PLAYER_SIZEY / 2 });
 	AntidoteSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
-	SkullSprite->setOrigin({ (float)SkullTexture.getSize().x/2, (float)SkullTexture.getSize().y / 2 });
+	SkullSprite->setOrigin({ (float)SkullTexture.getSize().x / 2, (float)SkullTexture.getSize().y / 2 });
 
 	std::thread thread(&renderingThread, &window);
 

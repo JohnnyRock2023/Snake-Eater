@@ -103,72 +103,71 @@ void spawnSnakes(int count) {
 }
 
 void moveSnakes() {
-	static int moves = 0;
-	int posX;
-	int posY;
-	int direction;
+	static int moveCounter = 0;
+	static int directionChangeCounter = 0;
 	for (int i = 0; i < snakes.size(); i++) {
 
-		posX = snakes[i].getBody()[0].pos.x;
-		posY = snakes[i].getBody()[0].pos.y;
+		int posX = snakes[i].getBody()[0].pos.x;
+		int posY = snakes[i].getBody()[0].pos.y;
+		vector<SnakeBody> &body = snakes[i].getBody();
+		int direction = snakes[i].getDirect();
 
-		for (int j = 0; j < 1; j++) {
-			if (moves == 0) {
+		if (moveCounter >= SNAKE_MOVES * OBJECT_SIZE) {
+			for (int j = 0; j < 1; j++) {
 				direction = rand() % 4;
 				switch (direction) {
 				case 0:
-					if (snakes[i].getDirect() == 1 || posY - OBJECT_SIZE < 0) {
+					if (snakes[i].getDirect() == 1 || posY - SNAKE_STEP <= 0) {
 						j--;
 					}
 					break;
 				case 1:
-					if (snakes[i].getDirect() == 0 || posY + OBJECT_SIZE > MAP_SIZEY) {
+					if (snakes[i].getDirect() == 0 || posY + SNAKE_STEP >= MAP_SIZEY) {
 						j--;
 					}
 					break;
 				case 2:
-					if (snakes[i].getDirect() == 3 || posX - OBJECT_SIZE < 0) {
+					if (snakes[i].getDirect() == 3 || posX - SNAKE_STEP <= 0) {
 						j--;
 					}
 					break;
 				case 3:
-					if (snakes[i].getDirect() == 2 || posX + OBJECT_SIZE > MAP_SIZEX) {
+					if (snakes[i].getDirect() == 2 || posX + SNAKE_STEP >= MAP_SIZEX) {
 						j--;
 					}
 					break;
 				}
 			}
-			else {
-				direction = snakes[i].getDirect();
+		}
+
+		switch (direction) {
+			case 0: body[0].pos.y -= SNAKE_STEP; break;
+			case 1: body[0].pos.y += SNAKE_STEP; break;
+			case 2: body[0].pos.x -= SNAKE_STEP; break;
+			case 3: body[0].pos.x += SNAKE_STEP; break;
+		}
+	
+			snakes[i].setDirect(direction);
+			body[0].bodyDirect = direction;
+		
+
+		for (int j = body.size() - 1; j > 0; j--) {
+			if (directionChangeCounter >= OBJECT_SIZE) {
+				body[j].bodyDirect = body[j - 1].bodyDirect;
+			}
+			switch (body[j].bodyDirect) {
+				case 0: body[j].pos.y -= SNAKE_STEP; break;
+				case 1: body[j].pos.y += SNAKE_STEP; break;
+				case 2: body[j].pos.x -= SNAKE_STEP; break;
+				case 3: body[j].pos.x += SNAKE_STEP; break;
 			}
 		}
-		for (int j = snakes[i].getBody().size() - 1; j >= 1; j--) {
-			snakes[i].getBody()[j] = snakes[i].getBody()[j - 1];
-			snakes[i].getBody()[j].bodyDirect = snakes[i].getBody()[j - 1].bodyDirect;
-		}
-		switch (direction) {
-		case 0:
-			snakes[i].getBody()[0].pos.y -= OBJECT_SIZE;
-			break;
-		case 1:
-			snakes[i].getBody()[0].pos.y += OBJECT_SIZE;
-			break;
-		case 2:
-			snakes[i].getBody()[0].pos.x -= OBJECT_SIZE;
-			break;
-		case 3:
-			snakes[i].getBody()[0].pos.x += OBJECT_SIZE;
-			break;
-		}
-		snakes[i].setDirect(direction);
-		snakes[i].getBody()[0].bodyDirect = direction;
 	}
-	if (moves == 0) {
-		moves = SNAKE_MOVES;
-	}
-	else {
-		moves--;
-	}
+	if (directionChangeCounter >= OBJECT_SIZE) directionChangeCounter = 0;
+	else directionChangeCounter += SNAKE_STEP;
+
+	if (moveCounter >= SNAKE_MOVES * OBJECT_SIZE) moveCounter = 0;
+	else moveCounter += SNAKE_STEP;
 }
 
 void drawSnakes(RenderWindow* window) {
@@ -199,17 +198,19 @@ void drawSnakes(RenderWindow* window) {
 				direct3 = snakes[i].getBody()[j - 1].bodyDirect;
 			}
 
-			if (((direct2 == 3 && direct3 == 0) || (direct2 == 1 && direct3 == 2)) && direct1 != direct3) {
-				SnakeBodySprite->setRotation(degrees(0));
-			}
-			else if (((direct2 == 1 && direct3 == 3) || (direct2 == 2 && direct3 == 0)) && direct1 != direct3) {
-				SnakeBodySprite->setRotation(degrees(90));
-			}
-			else if (((direct2 == 2 && direct3 == 1) || (direct2 == 0 && direct3 == 3)) && direct1 != direct3) {
-				SnakeBodySprite->setRotation(degrees(180));
-			}
-			else if (((direct2 == 3 && direct3 == 1) || (direct2 == 0 && direct3 == 2)) && direct1 != direct3) {
-				SnakeBodySprite->setRotation(degrees(270));
+			if (direct1 != direct3) {
+				if (((direct2 == 3 && direct3 == 0) || (direct2 == 1 && direct3 == 2))) {
+					SnakeBodySprite->setRotation(degrees(0));
+				}
+				else if ((direct2 == 1 && direct3 == 3) || (direct2 == 2 && direct3 == 0)) {
+					SnakeBodySprite->setRotation(degrees(90));
+				}
+				else if ((direct2 == 2 && direct3 == 1) || (direct2 == 0 && direct3 == 3)) {
+					SnakeBodySprite->setRotation(degrees(180));
+				}
+				else if ((direct2 == 3 && direct3 == 1) || (direct2 == 0 && direct3 == 2)) {
+					SnakeBodySprite->setRotation(degrees(270));
+				}
 			}
 			else if (direct1 == 0 || direct1 == 1) {
 				SnakeBodySprite->setTexture(SnakeBodyTexture, false);
@@ -245,13 +246,13 @@ void attackSnake(int playerDirect) {
 	for (int i = 0; i < snakes.size(); i++) {
 		for (int j = 0; j < snakes[i].getBody().size(); j++) {
 			snakePos = snakes[i].getBody()[j].pos;
-			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 2) && 
+			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 2) &&
 				inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE * 3)) {
 				snakes[i].hitSnake();
 				score += 10;
 				PlayHitSnakeSound();
 			}
-			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 3) && 
+			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 3) &&
 				inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE)) {
 				snakes[i].hitSnake();
 				score += 10;
@@ -297,7 +298,7 @@ void snakeBite() {
 	for (int i = 0; i < snakes.size(); i++) {
 		posX = snakes[i].getBody()[0].pos.x;
 		posY = snakes[i].getBody()[0].pos.y;
-		if (inRange(playerPosX + PLAYER_SIZEX / 2, posX - OBJECT_SIZE, posX + OBJECT_SIZE * 3) && 
+		if (inRange(playerPosX + PLAYER_SIZEX / 2, posX - OBJECT_SIZE, posX + OBJECT_SIZE * 3) &&
 			inRange(playerPosY + PLAYER_SIZEY / 2, posY - OBJECT_SIZE, posY + OBJECT_SIZE * 2)) {
 			isPoisoned = true;
 			poisonClock->restart();
@@ -328,9 +329,8 @@ void drawAntidotes(RenderWindow* window) {
 
 }
 void useAntidote() {
-	;
 	for (int i = 0; i < antidotes.size(); i++) {
-		if (inRange(playerPosX + PLAYER_SIZEX / 2, antidotes[i].x - OBJECT_SIZE / 2, antidotes[i].x + OBJECT_SIZE * 2) && 
+		if (inRange(playerPosX + PLAYER_SIZEX / 2, antidotes[i].x - OBJECT_SIZE / 2, antidotes[i].x + OBJECT_SIZE * 2) &&
 			inRange(playerPosY + PLAYER_SIZEY / 2, antidotes[i].y - OBJECT_SIZE / 2, antidotes[i].y + OBJECT_SIZE)) {
 			PlayAntidoteSound();
 			isPoisoned = false;
@@ -353,10 +353,10 @@ void displayScore(RenderWindow* window) {
 void displayTimeToDeath(RenderWindow* window) {
 	if (isPoisoned) {
 		timeToDeath->setOrigin({ timeToDeath->getLocalBounds().getCenter().x, 0 });
-		SkullSprite->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 + SkullTexture.getSize().x/2, viewPosY - SCREEN_RESY / 2 + 135});
-		timeToDeath->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 + SkullTexture.getSize().x/2,
-			                       viewPosY - SCREEN_RESY / 2 + SkullTexture.getSize().y + 100});
-		
+		SkullSprite->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 + SkullTexture.getSize().x / 2, viewPosY - SCREEN_RESY / 2 + 135 });
+		timeToDeath->setPosition({ viewPosX - SCREEN_RESX / 2 + 30 + SkullTexture.getSize().x / 2,
+								   viewPosY - SCREEN_RESY / 2 + SkullTexture.getSize().y + 100 });
+
 		float timeLeft = DEATH - poisonTimer;
 		if (timeLeft <= 6.f) {
 			PlayTimerSound(1.7f);

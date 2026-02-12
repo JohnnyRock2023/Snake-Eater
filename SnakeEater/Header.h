@@ -5,6 +5,8 @@
 #include <SFML/Window.hpp>
 #include <SFML/Network.hpp>
 #include <SFML/Audio.hpp>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
 #include <Windows.h>
 #include <thread>
 #include <vector>
@@ -12,6 +14,10 @@
 #include <string>
 #include <random>
 #include <cmath>
+#include <mutex>
+#include <queue>
+#pragma comment(lib, "ws2_32.lib")
+
 using namespace sf;
 using namespace std;
 
@@ -28,7 +34,8 @@ extern float SCREEN_RESY;
 #define SPEED 12   // < 10 - Faster; > 10 - Slower
 #define MIN_SNAKE_SIZE 4
 #define MAX_SNAKE_SIZE 9
-#define SNAKE_SPEED 400
+#define SNAKE_SPEED 25
+#define SNAKE_STEP 1
 #define SNAKE_MOVES 2
 #define NUM_OF_SNAKES 30
 #define NUM_OF_ADDITIONAL_SNAKES 10
@@ -46,6 +53,7 @@ extern float viewPosX;
 extern float viewPosY;
 extern int game_status;
 extern short int playerDirection;
+extern int coop_mode;
 extern int score;
 extern int bestScore;
 extern bool isPoisoned;
@@ -54,7 +62,7 @@ extern float pauseTimer;
 
 class Object {
 private:
-	short int type;
+	int type;
 	Vector2f pos;
 
 public:
@@ -73,7 +81,7 @@ public:
 
 class SnakeBody {
 public:
-	short int bodyDirect;
+	int bodyDirect;
 	Vector2f pos;
 
 	SnakeBody(int direct, Vector2f pos) {
@@ -84,8 +92,8 @@ public:
 
 class Snake {
 private:
-	short int direction = 0;
-	short int size;
+	int direction = 0;
+	int size;
 	vector<SnakeBody> body;
 
 public:
@@ -117,6 +125,56 @@ public:
 			body.pop_back();
 			size = (short)body.size();
 		}
+	}
+};
+
+
+class Package {
+public:
+	int game_status;
+	int score;
+	int bestScore;
+	int playerID;
+	float playerPosX;
+	float playerPosY;
+	vector<Snake> snakes;
+	vector<Vector2f> antidotes;
+	map<int, Vector2f> players;
+
+	Package() {
+		this->game_status = 0;
+		this->score = 0;
+		this->bestScore = 0;
+		this->playerID = 10;
+		this->playerPosX = 0;
+		this->playerPosY = 0;
+		this->snakes = vector<Snake>();
+		this->antidotes = vector<Vector2f>();
+	}
+
+	Package(int game_status,
+		int score,
+		int bestScore,
+		int playerID,
+		float playerPosX,
+		float playerPosY,
+		vector<Snake> snakes,
+		vector<Vector2f> antidotes) {
+		this->game_status = game_status;
+		this->bestScore = bestScore;
+		this->playerID = playerID;
+		this->playerPosX = playerPosX;
+		this->playerPosY = playerPosY;
+		this->snakes = vector<Snake>(snakes);
+		for (int i = 0; i < snakes.size(); i++) {
+			this->snakes[i].getBody() = vector<SnakeBody>(snakes[i].getBody());
+		}
+	}
+
+	~Package() {
+		snakes.clear();
+		players.clear();
+		antidotes.clear();
 	}
 };
 
@@ -194,6 +252,18 @@ void displayTimeToDeath(RenderWindow* window);
 void restart();
 void isTheBest();
 bool isNearPlayer(float posX, float posY);
+void createSock();
+void createServer();
+void connectToServer();
+void sendToServer(Package *pckg);
+Package* getFromServer();
+void sendObjects();
+void recvObjects();
+void sendFloat(float f);
+void sendInt(int32_t v);
+void syncData();
+void createSendPackage();
+void getRecvPackage();
 
 //VikaK
 void handleZoom(View& view);

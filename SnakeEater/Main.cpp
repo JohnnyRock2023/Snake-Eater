@@ -1,7 +1,7 @@
 #include "Header.h"
 
 int game_status = 0;
-int coop_mode = 1;
+int coop_mode = 0;
 int score = 0;
 int bestScore = 0;
 bool isPoisoned = false;
@@ -18,6 +18,7 @@ float pauseTimer = 0;
 vector<Object> objects;
 vector<Snake> snakes;
 vector<Vector2f> antidotes;
+vector<int> hittedSnakes = vector<int>(NUM_OF_SNAKES, 0);
 
 Texture PlayerFrontTexture;
 Texture PlayerBackTexture;
@@ -75,8 +76,19 @@ float playerPosY = (MAP_SIZEY / 2);
 float viewPosX = (MAP_SIZEX / 2);
 float viewPosY = (MAP_SIZEY / 2);
 
-void test() {
-	int i = 0;
+std::thread syncThread;
+
+void createServerThread() {
+	if (coop_mode == 1 || coop_mode == 2) {
+		coop_mode == 1 ? createServer() : connectToServer();
+		coop_mode = 3;
+		try {
+			syncThread = std::thread(&syncData);
+		}
+		catch (...) {
+			MessageBoxA(NULL, "Не вдалося створити потік синхронізації даних", "Помилка", MB_OK | MB_ICONERROR);
+		}
+	}
 }
 
 View view({ viewPosX, viewPosY }, { SCREEN_RESX, SCREEN_RESY });
@@ -99,17 +111,6 @@ void renderingThread(RenderWindow* window)
 	setAntidotesPos(MAX_NUM_OF_ANTIDOTES);
 	spawnSnakes(NUM_OF_SNAKES);
 
-	/*std::thread syncThread;
-
-	if (coop_mode) {
-		coop_mode == 1 ? createServer() : connectToServer();
-		try {
-			syncThread = std::thread(&syncData);
-		}
-		catch (...) {
-			MessageBoxA(NULL, "Не вдалося створити потік синхронізації даних", "Помилка", MB_OK | MB_ICONERROR);
-		}
-	}*/
 
 	Clock clock;
 	Clock snakeClock;
@@ -212,9 +213,6 @@ void renderingThread(RenderWindow* window)
 				moveSnakes();
 			}
 
-			//createSendPackage();
-			//getRecvPackage();
-
 			handleZoom(view);
 			view.setCenter({ viewPosX, viewPosY });
 			window->setView(view);
@@ -223,7 +221,7 @@ void renderingThread(RenderWindow* window)
 			drawAntidotes(window);
 			deleteSnakes();
 			drawSnakes(window);
-
+			createServerThread();
 		
 
 			if (game_status == 1) {
@@ -257,9 +255,9 @@ void renderingThread(RenderWindow* window)
 		}
 		window->display();
 	}
-	/*if (coop_mode) {
+	if (coop_mode) {
 		syncThread.join();
-	}*/
+	}
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {

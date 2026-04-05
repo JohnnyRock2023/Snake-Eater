@@ -4,6 +4,13 @@ float posForButtonX = viewPosX - SCREEN_RESX / 2;
 float posForButtonY = viewPosY - SCREEN_RESY / 2;
 float startButtonPosX = viewPosX - BUTTON_WIDTH / 2;
 float startButtonPosY = viewPosY + 20;
+
+float createServerButtonPosX = viewPosX + BUTTON_WIDTH;
+float createServerButtonPosY = viewPosY + 20;
+
+float connectServerButtonPosX = viewPosX + BUTTON_WIDTH;
+float connectServerButtonPosY = viewPosY +130;
+
 float exitButtonPosX = viewPosX - BUTTON_WIDTH / 2;
 float exitButtonPosY = viewPosY + 130;
 float pauseButtonX = viewPosX - BUTTON_WIDTH / 2;
@@ -28,12 +35,18 @@ void showStartMenu(RenderWindow* window) {
 
 	StartButtonSprite->setPosition({ startButtonPosX, startButtonPosY });
 	ExitButtonSprite->setPosition({ exitButtonPosX, exitButtonPosY });
-
 	LogoSprite->setPosition({ viewPosX - LogoTexture.getSize().x / 2,  viewPosY - 250 });
 
 	window->draw(*LogoSprite);
 	window->draw(*StartButtonSprite);
 	window->draw(*ExitButtonSprite);
+
+	StartButtonSprite->setPosition({ createServerButtonPosX, createServerButtonPosY });
+	ExitButtonSprite->setPosition({ connectServerButtonPosX, connectServerButtonPosY });
+
+	window->draw(*StartButtonSprite);
+	window->draw(*ExitButtonSprite);
+
 
 	if (pauseTimer > 300 && Mouse::isButtonPressed(Mouse::Button::Left)) {
 		Vector2i mousePos = Mouse::getPosition(*window);
@@ -45,6 +58,7 @@ void showStartMenu(RenderWindow* window) {
 			AudioTrack();
 			restart();
 			game_status = 1;
+			coop_mode = 0;
 			menuPl = false;
 		}
 		// Натиск на кнопку виходу
@@ -54,6 +68,34 @@ void showStartMenu(RenderWindow* window) {
 			window->close();
 			
 		}
+
+		if (inRange(posForButtonX + mousePos.x, createServerButtonPosX, createServerButtonPosX + BUTTON_WIDTH) &&
+			inRange(posForButtonY + mousePos.y, createServerButtonPosY, createServerButtonPosY + BUTTON_HEIGHT)) {
+			PlayButtonClickSound();
+			game_status = 1;
+			coop_mode = 1;
+			createServerThread();
+			StopMenuMusic();
+			AudioTrack();
+			restart();
+			menuPl = false;
+
+		}
+
+		if (inRange(posForButtonX + mousePos.x, connectServerButtonPosX, connectServerButtonPosX + BUTTON_WIDTH) &&
+			inRange(posForButtonY + mousePos.y, connectServerButtonPosY, connectServerButtonPosY + BUTTON_HEIGHT)) {
+			PlayButtonClickSound();
+			game_status = 1;
+			coop_mode = 2;
+			createServerThread();
+			StopMenuMusic();
+			AudioTrack();
+			snakes.clear();
+			objects.clear();
+			antidotes.clear();
+			menuPl = false;
+		}
+
 	}
 }
 

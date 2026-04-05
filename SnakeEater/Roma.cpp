@@ -1,5 +1,7 @@
 #include "Header.h"
 
+
+
 void setObjectsPos() {
 	float posX;
 	float posY;
@@ -106,7 +108,6 @@ void moveSnakes() {
 	static int moveCounter = 0;
 	static int directionChangeCounter = 0;
 	for (int i = 0; i < snakes.size(); i++) {
-
 		int posX = snakes[i].getBody()[0].pos.x;
 		int posY = snakes[i].getBody()[0].pos.y;
 		vector<SnakeBody> &body = snakes[i].getBody();
@@ -146,14 +147,11 @@ void moveSnakes() {
 			case 2: body[0].pos.x -= SNAKE_STEP; break;
 			case 3: body[0].pos.x += SNAKE_STEP; break;
 		}
-	
-			snakes[i].setDirect(direction);
-			body[0].bodyDirect = direction;
-		
 
 		for (int j = body.size() - 1; j > 0; j--) {
-			if (directionChangeCounter >= OBJECT_SIZE) {
-				body[j].bodyDirect = body[j - 1].bodyDirect;
+			if (directionChangeCounter == OBJECT_SIZE || directionChangeCounter == OBJECT_SIZE * 2) {
+				if (j == 1 && directionChangeCounter >= OBJECT_SIZE * 2);
+				else body[j].bodyDirect = body[j - 1].bodyDirect;
 			}
 			switch (body[j].bodyDirect) {
 				case 0: body[j].pos.y -= SNAKE_STEP; break;
@@ -162,8 +160,10 @@ void moveSnakes() {
 				case 3: body[j].pos.x += SNAKE_STEP; break;
 			}
 		}
+		snakes[i].setDirect(direction);
+		body[0].bodyDirect = direction;
 	}
-	if (directionChangeCounter >= OBJECT_SIZE) directionChangeCounter = 0;
+	if (directionChangeCounter == OBJECT_SIZE*2) directionChangeCounter = 0;
 	else directionChangeCounter += SNAKE_STEP;
 
 	if (moveCounter >= SNAKE_MOVES * OBJECT_SIZE) moveCounter = 0;
@@ -248,12 +248,14 @@ void attackSnake(int playerDirect) {
 			snakePos = snakes[i].getBody()[j].pos;
 			if ((playerDirect == 0 || playerDirect == 1) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 2) &&
 				inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE * 3)) {
+				hittedSnakes[i]++;
 				snakes[i].hitSnake();
 				score += 10;
 				PlayHitSnakeSound();
 			}
 			else if ((playerDirect == 2 || playerDirect == 3) && inRange(playerPosX + PLAYER_SIZEX / 2, snakePos.x - OBJECT_SIZE, snakePos.x + OBJECT_SIZE * 3) &&
 				inRange(playerPosY + PLAYER_SIZEY / 2, snakePos.y - OBJECT_SIZE, snakePos.y + OBJECT_SIZE)) {
+				hittedSnakes[i]++;
 				snakes[i].hitSnake();
 				score += 10;
 				PlayHitSnakeSound();

@@ -16,6 +16,7 @@
 #include <cmath>
 #include <mutex>
 #include <queue>
+#include <map>
 #pragma comment(lib, "ws2_32.lib")
 
 using namespace sf;
@@ -181,6 +182,7 @@ public:
 extern vector<Object> objects;
 extern vector<Snake> snakes;
 extern vector<Vector2f> antidotes;
+extern vector<int> hittedSnakes;
 
 extern Sprite* GrassSprite;
 extern Sprite* RockSprite;
@@ -232,6 +234,7 @@ extern View view;
 //FUNCTIONS
 
 //Kutsenko Roman
+void createServerThread();
 void setObjectsPos();
 void fillTheMapWithObj(RenderWindow* window);
 void spawnSnakes(int count);

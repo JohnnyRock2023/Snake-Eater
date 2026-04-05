@@ -60,15 +60,15 @@ void getRecvPackage() { /// For main thread
 void syncData() {
 	Package* pckg = nullptr;
 	while (true) {
+		pckg = getFromServer();
+		if (pckg != nullptr) {
+			createRecvPackage(pckg);
+		}
+		createSendPackage();
 		pckg = getSendPackage();
 		if (pckg != nullptr) {
 			sendToServer(pckg);
 			delete pckg;
-		}
-		this_thread::sleep_for(chrono::milliseconds(100));
-		pckg = getFromServer();
-		if (pckg != nullptr) {
-			createRecvPackage(pckg);
 		}
 	}
 }
@@ -153,10 +153,7 @@ void connectToServer() {
 	createSock();
 	sendFloat(playerPosX);
 	sendFloat(playerPosY);
-	playerID = recvInt();
 	recvObjects();
-	getFromServer();
-	getRecvPackage();
 }
 
 void sendObjects() {
@@ -177,26 +174,36 @@ void sendToServer(Package *pckg) {
 	sendInt(pckg->playerID);
 	sendFloat(pckg->playerPosX);
 	sendFloat(pckg->playerPosY);
-	sendInt(pckg->snakes.size());
-	for (Snake snake : pckg->snakes) {
-		sendInt(snake.getSize());
-		sendInt(snake.getDirect());
-		for (SnakeBody bodyPart : snake.getBody()) {
-			sendInt(bodyPart.bodyDirect);
-			sendFloat(bodyPart.pos.x);
-			sendFloat(bodyPart.pos.y);
+	if (playerID == 1) {
+		sendInt(NUM_OF_SNAKES);
+		for (Snake snake : pckg->snakes) {
+			sendInt(snake.getSize());
+			sendInt(snake.getDirect());
+			for (SnakeBody bodyPart : snake.getBody()) {
+				sendInt(bodyPart.bodyDirect);
+				sendFloat(bodyPart.pos.x);
+				sendFloat(bodyPart.pos.y);
+			}
+		}
+		sendInt(pckg->antidotes.size());
+		for (Vector2f antidotePos : pckg->antidotes) {
+			sendFloat(antidotePos.x);
+			sendFloat(antidotePos.y);
 		}
 	}
-	sendInt(pckg->antidotes.size());
-	for (Vector2f antidotePos : pckg->antidotes) {
-		sendFloat(antidotePos.x);
-		sendFloat(antidotePos.y);
+	else {
+		sendInt(hittedSnakes.size());
+		for (int i = 0; i < hittedSnakes.size(); i++) {
+			sendInt(hittedSnakes[i]);
+		}
+		hittedSnakes.clear();
+		hittedSnakes = vector<int>(hittedSnakes.size(), 0);
 	}
 }
 
 void recvObjects() {
-	int objCount = recvInt();
 	playerID = recvInt();
+	int objCount = recvInt();
 	objects.clear();
 	for (int i = 0; i < objCount; i++) {
 		int type = recvInt();
@@ -208,9 +215,7 @@ void recvObjects() {
 
 Package* getFromServer() {
 	Package* pckg = new Package();
-	recvInt(); 
-	pckg->game_status = 1;
-	//pckg->game_status = recvInt();
+	pckg->game_status = recvInt();
 	pckg->score = recvInt();
 	pckg->bestScore = recvInt();
 	pckg->players.clear();
@@ -221,24 +226,38 @@ Package* getFromServer() {
 		float playersPosY = recvFloat();
 		pckg->players.insert({ id, {playersPosX, playersPosY} });
 	}
-	int snakesNum = recvInt();
-	for (int i = 0; i < snakesNum; i++) {
-		int snakeSize = recvInt();
-		int direct = recvInt();
-		vector<SnakeBody> body = vector<SnakeBody>();
-		for (int j = 0; j < snakeSize; j++) {
-			int bodyDirect = recvInt();
+	if (playerID != 1) {
+		int snakesNum = recvInt();
+		for (int i = 0; i < snakesNum; i++) {
+			int snakeSize = recvInt();
+			int direct = recvInt();
+			vector<SnakeBody> body = vector<SnakeBody>();
+			for (int j = 0; j < snakeSize; j++) {
+				int bodyDirect = recvInt();
+				float posX = recvFloat();
+				float posY = recvFloat();
+				body.push_back(SnakeBody(bodyDirect, { posX, posY }));
+			}
+			pckg->snakes.push_back(Snake(snakeSize, direct, body));
+		}
+		int antidotesNum = recvInt();
+		for (int i = 0; i < antidotesNum; i++) {
 			float posX = recvFloat();
 			float posY = recvFloat();
-			body.push_back(SnakeBody(bodyDirect, { posX, posY }));
+			pckg->antidotes.push_back({ posX, posY });
 		}
-		pckg->snakes.push_back(Snake(snakeSize, direct, body));
 	}
-	int antidotesNum = recvInt();
-	for (int i = 0; i < antidotesNum; i++) {
-		float posX = recvFloat();
-		float posY = recvFloat();
-		pckg->antidotes.push_back({ posX, posY });
+	else {
+		int snakesNum = recvInt();
+		for (int i = 0; i < snakesNum; i++) {
+			int snakeHits = recvInt();
+			if (snakeHits > 0) {
+				for (int j = 0; j < snakeHits; j++) {
+					snakes[i].hitSnake();
+				}
+			}
+		}
 	}
 	return pckg;
 }
+

@@ -338,6 +338,7 @@ void useAntidote() {
 			isPoisoned = false;
 			poisonTimer = 0;
 			antidotes.erase(antidotes.begin() + i);
+			usedAntidotes.push_back({ antidotes[i].x, antidotes[i].y });
 			return;
 		}
 	}
@@ -371,6 +372,14 @@ void displayTimeToDeath(RenderWindow* window) {
 		timeToDeath->setString(to_string((int)(DEATH - poisonTimer)));
 		window->draw(*timeToDeath);
 		window->draw(*SkullSprite);
+	}
+}
+
+void drawPlayers(RenderWindow* window) {
+	for (auto& player : players) {
+		PlayerSprite->setPosition(player.second);
+		PlayerSprite->setTexture(PlayerFrontTexture, false);
+		window->draw(*PlayerSprite);
 	}
 }
 

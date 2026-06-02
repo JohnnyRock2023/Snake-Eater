@@ -74,7 +74,6 @@ void showStartMenu(RenderWindow* window) {
 			PlayButtonClickSound();
 			game_status = 1;
 			coop_mode = 1;
-			createServerThread();
 			StopMenuMusic();
 			AudioTrack();
 			restart();
@@ -87,7 +86,6 @@ void showStartMenu(RenderWindow* window) {
 			PlayButtonClickSound();
 			game_status = 1;
 			coop_mode = 2;
-			createServerThread();
 			StopMenuMusic();
 			AudioTrack();
 			snakes.clear();

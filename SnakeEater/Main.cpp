@@ -19,6 +19,7 @@ vector<Object> objects;
 vector<Snake> snakes;
 vector<Vector2f> antidotes;
 vector<int> hittedSnakes = vector<int>(NUM_OF_SNAKES, 0);
+vector<Vector2f> usedAntidotes = vector<Vector2f>();
 
 Texture PlayerFrontTexture;
 Texture PlayerBackTexture;
@@ -76,14 +77,20 @@ float playerPosY = (MAP_SIZEY / 2);
 float viewPosX = (MAP_SIZEX / 2);
 float viewPosY = (MAP_SIZEY / 2);
 
-std::thread syncThread;
+std::jthread syncThread;
+
+void openConsole() {
+	AllocConsole();
+	FILE* f;
+	freopen_s(&f, "CONOUT$", "w", stdout);
+}
 
 void createServerThread() {
 	if (coop_mode == 1 || coop_mode == 2) {
 		coop_mode == 1 ? createServer() : connectToServer();
 		coop_mode = 3;
 		try {
-			syncThread = std::thread(&syncData);
+			syncThread = std::jthread(&syncData);
 		}
 		catch (...) {
 			MessageBoxA(NULL, "Не вдалося створити потік синхронізації даних", "Помилка", MB_OK | MB_ICONERROR);
@@ -111,13 +118,13 @@ void renderingThread(RenderWindow* window)
 	setAntidotesPos(MAX_NUM_OF_ANTIDOTES);
 	spawnSnakes(NUM_OF_SNAKES);
 
-
 	Clock clock;
 	Clock snakeClock;
 	Clock attackClock;
 	Clock pauseClock;
 	poisonClock = new Clock;
 
+	//openConsole();
 	while (window->isOpen())
 	{
 		float pauseTime = pauseClock.getElapsedTime().asMilliseconds();
@@ -172,17 +179,7 @@ void renderingThread(RenderWindow* window)
 					PlayFootStepSound();
 					playerDirection = 3;
 				}
-				PlayerSprite->setPosition({ playerPosX, playerPosY });
-				switch (playerDirection) {
-				case 0:
-					PlayerSprite->setTexture(PlayerBackTexture, false); break;
-				case 1:
-					PlayerSprite->setTexture(PlayerFrontTexture, false); break;
-				case 2:
-					PlayerSprite->setTexture(PlayerLeftTexture, false); break;
-				case 3:
-					PlayerSprite->setTexture(PlayerRightTexture, false); break;
-				}
+
 			}
 
 			if (attackTimer > HIT_DELAY) {
@@ -199,7 +196,16 @@ void renderingThread(RenderWindow* window)
 			}
 
 			if (poisonTimer > DEATH) {
-				game_status = 3;
+				if (coop_mode == 0 || playerID == 0) {
+					game_status = 3;
+				}
+				if (coop_mode || playerID != 0) {
+					game_status = 0;
+					coop_mode = 0;
+					syncThread.request_stop();
+					closesocket(clientSock);
+					restart();
+				}
 			}
 		}
 
@@ -208,11 +214,12 @@ void renderingThread(RenderWindow* window)
 			snakeClock.restart();
 			snakeTimer += snakeTime;
 
-			if (snakeTimer > SNAKE_SPEED) {
+			if ((coop_mode == 0 || playerID == 0) && snakeTimer > SNAKE_SPEED) {
 				snakeTimer = 0;
 				moveSnakes();
 			}
-
+			createServerThread();
+			getRecvPackage();
 			handleZoom(view);
 			view.setCenter({ viewPosX, viewPosY });
 			window->setView(view);
@@ -221,17 +228,25 @@ void renderingThread(RenderWindow* window)
 			drawAntidotes(window);
 			deleteSnakes();
 			drawSnakes(window);
-			createServerThread();
-		
 
 			if (game_status == 1) {
+				PlayerSprite->setPosition({ playerPosX, playerPosY });
+				switch (playerDirection) {
+				case 0:
+					PlayerSprite->setTexture(PlayerBackTexture, false); break;
+				case 1:
+					PlayerSprite->setTexture(PlayerFrontTexture, false); break;
+				case 2:
+					PlayerSprite->setTexture(PlayerLeftTexture, false); break;
+				case 3:
+					PlayerSprite->setTexture(PlayerRightTexture, false); break;
+				}
 				window->draw(*PlayerSprite);
-				////////////////////////////////////////////////////////
+				drawPlayers(window);
 				if (snakes.size() <= 1) {
 					spawnSnakes(NUM_OF_ADDITIONAL_SNAKES);
 					setAntidotesPos(NUM_OF_ADDITIONAL_ANTIDOTES);
 				}
-				////////////////////////////////////////////////////////
 				if (!isPoisoned) {
 					snakeBite();
 				}
@@ -255,14 +270,11 @@ void renderingThread(RenderWindow* window)
 		}
 		window->display();
 	}
-	if (coop_mode) {
-		syncThread.join();
-	}
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	ContextSettings settings;
-	settings.antiAliasingLevel = 8;
+	settings.antiAliasingLevel = 4;
 
 	RenderWindow window(VideoMode({ (unsigned int)SCREEN_RESX, (unsigned int)SCREEN_RESY }), "Snake Eater", State::Windowed, settings);
 
@@ -354,5 +366,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 	thread.join();
+	syncThread.request_stop();
 	return 0;
 }

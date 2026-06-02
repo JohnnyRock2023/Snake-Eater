@@ -17,6 +17,7 @@
 #include <mutex>
 #include <queue>
 #include <map>
+#include <iostream>
 #pragma comment(lib, "ws2_32.lib")
 
 using namespace sf;
@@ -43,7 +44,7 @@ extern float SCREEN_RESY;
 #define HIT_DELAY 500
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 90
-#define DEATH 15
+#define DEATH 1
 #define MIN_NUM_OF_ANTIDOTES 4
 #define MAX_NUM_OF_ANTIDOTES 6
 #define NUM_OF_ADDITIONAL_ANTIDOTES 2
@@ -60,6 +61,9 @@ extern int bestScore;
 extern bool isPoisoned;
 extern float poisonTimer;
 extern float pauseTimer;
+extern int playerID;
+extern int clientSock;
+extern map<int, Vector2f> players;
 
 class Object {
 private:
@@ -130,6 +134,16 @@ public:
 };
 
 
+class Player {
+	public:
+	int id;
+	Vector2f pos;
+	Player(int id, float posX, float posY) {
+		this->id = id;
+		this->pos = { posX, posY };
+	}
+};
+
 class Package {
 public:
 	int game_status;
@@ -162,6 +176,7 @@ public:
 		vector<Snake> snakes,
 		vector<Vector2f> antidotes) {
 		this->game_status = game_status;
+		this->score = score;
 		this->bestScore = bestScore;
 		this->playerID = playerID;
 		this->playerPosX = playerPosX;
@@ -169,6 +184,10 @@ public:
 		this->snakes = vector<Snake>(snakes);
 		for (int i = 0; i < snakes.size(); i++) {
 			this->snakes[i].getBody() = vector<SnakeBody>(snakes[i].getBody());
+		}
+		this->antidotes = vector<Vector2f>(antidotes);
+		for (int i = 0; i < antidotes.size(); i++) {
+			this->antidotes[i] = Vector2f(antidotes[i]);
 		}
 	}
 
@@ -183,6 +202,7 @@ extern vector<Object> objects;
 extern vector<Snake> snakes;
 extern vector<Vector2f> antidotes;
 extern vector<int> hittedSnakes;
+extern vector<Vector2f> usedAntidotes;
 
 extern Sprite* GrassSprite;
 extern Sprite* RockSprite;
@@ -264,9 +284,10 @@ void sendObjects();
 void recvObjects();
 void sendFloat(float f);
 void sendInt(int32_t v);
-void syncData();
+void syncData(std::stop_token stoken);
 void createSendPackage();
 void getRecvPackage();
+void drawPlayers(RenderWindow* window);
 
 //VikaK
 void handleZoom(View& view);

@@ -4,6 +4,8 @@ int game_status = 0;
 int coop_mode = 0;
 int score = 0;
 int bestScore = 0;
+
+int inputType = 0;
 bool isPoisoned = false;
 
 float SCREEN_RESX = 1280;
@@ -14,6 +16,9 @@ float snakeTimer = 0;
 float attackTimer = 0;
 float poisonTimer = 0;
 float pauseTimer = 0;
+
+string IPInput = "192.168.1.100";
+string codeInput = "";
 
 vector<Object> objects;
 vector<Snake> snakes;
@@ -50,16 +55,23 @@ Text* textScore = nullptr;
 Text* textBestScore = nullptr;
 Text* timeToDeath = nullptr;
 
+Text* IPText = nullptr;
+Text* codeText = nullptr;
+Text* inviteText = nullptr;
+Font font;
+
 Sprite* GrassSprite = nullptr;
 Sprite* RockSprite = nullptr;
 Sprite* StumpSprite = nullptr;
 Sprite* BushSprite = nullptr;
 Sprite* PlayerSprite = nullptr;
 Sprite* SnakeBodySprite = nullptr;
+Sprite* SnakeBodyBendSprite = nullptr;
 Sprite* SnakeHeadSprite = nullptr;
 Sprite* SnakeTailSprite = nullptr;
 Sprite* GroundSprite = nullptr;
 Sprite* StartButtonSprite = nullptr;
+Sprite* CoopButtonSprite = nullptr;
 Sprite* ExitButtonSprite = nullptr;
 Sprite* ContinueButtonSprite = nullptr;
 Sprite* RestartButtonSprite = nullptr;
@@ -68,8 +80,12 @@ Sprite* LogoSprite = nullptr;
 Sprite* GameOverSprite = nullptr;
 Sprite* AntidoteSprite = nullptr;
 Sprite* SkullSprite = nullptr;
-
 Clock* poisonClock = nullptr;
+
+mutex mtx1;
+mutex mtx2;
+mutex mtx_game_status;
+mutex mtx_coop_mode;
 
 short int playerDirection = 1;
 float playerPosX = (MAP_SIZEX / 2);
@@ -78,6 +94,7 @@ float viewPosX = (MAP_SIZEX / 2);
 float viewPosY = (MAP_SIZEY / 2);
 
 std::jthread syncThread;
+std::jthread connToServ;
 
 void openConsole() {
 	AllocConsole();
@@ -86,9 +103,18 @@ void openConsole() {
 }
 
 void createServerThread() {
-	if (coop_mode == 1 || coop_mode == 2) {
-		coop_mode == 1 ? createServer() : connectToServer();
-		coop_mode = 3;
+	static Clock threadTry;
+	mtx_coop_mode.lock();
+	if (coop_mode == 1 && threadTry.getElapsedTime().asMilliseconds() > 3000) {
+		threadTry.restart();
+		connToServ = std::jthread(&createServer, &IPInput);
+	}
+	else if (coop_mode == 2 && threadTry.getElapsedTime().asMilliseconds() > 3000) {
+		threadTry.restart();
+		connToServ = std::jthread(&connectToServer, &IPInput, stoi(codeInput));
+	}
+	else if (coop_mode == 3) {
+		coop_mode = 4;
 		try {
 			syncThread = std::jthread(&syncData);
 		}
@@ -96,6 +122,7 @@ void createServerThread() {
 			MessageBoxA(NULL, "Не вдалося створити потік синхронізації даних", "Помилка", MB_OK | MB_ICONERROR);
 		}
 	}
+	mtx_coop_mode.unlock();
 }
 
 View view({ viewPosX, viewPosY }, { SCREEN_RESX, SCREEN_RESY });
@@ -209,7 +236,7 @@ void renderingThread(RenderWindow* window)
 			}
 		}
 
-		if (game_status == 1 || game_status == 0 || game_status == 3) {
+		if (game_status == 1 || game_status == 4 || game_status == 0 || game_status == 3) {
 			float snakeTime = snakeClock.getElapsedTime().asMilliseconds();
 			snakeClock.restart();
 			snakeTimer += snakeTime;
@@ -219,8 +246,16 @@ void renderingThread(RenderWindow* window)
 				moveSnakes();
 			}
 			createServerThread();
-			getRecvPackage();
+			if (coop_mode == 4) {
+				getRecvPackage();
+			}
 			handleZoom(view);
+			if (viewPosY - (SCREEN_RESY / 2) > 0 && viewPosY + (SCREEN_RESY / 2) < MAP_SIZEY) {
+				viewPosY += (playerPosY - viewPosY) * 0.15f;
+			}
+			if (viewPosX + (SCREEN_RESX / 2) < MAP_SIZEX && viewPosX - (SCREEN_RESX / 2) > 0) {
+				viewPosX += (playerPosX - viewPosX) * 0.15f;
+			}
 			view.setCenter({ viewPosX, viewPosY });
 			window->setView(view);
 			drawGround(window);
@@ -228,8 +263,14 @@ void renderingThread(RenderWindow* window)
 			drawAntidotes(window);
 			deleteSnakes();
 			drawSnakes(window);
+			if (coop_mode && inviteCode != NULL) {
+				inviteText->setPosition({ viewPosX + SCREEN_RESX / 2 - 300, viewPosY - SCREEN_RESY / 2 + 30 });
+				inviteText->setString("INVITE CODE: " + to_string(inviteCode));
+				window->draw(*inviteText);
+			}
 
 			if (game_status == 1) {
+				drawPlayers(window);
 				PlayerSprite->setPosition({ playerPosX, playerPosY });
 				switch (playerDirection) {
 				case 0:
@@ -242,7 +283,6 @@ void renderingThread(RenderWindow* window)
 					PlayerSprite->setTexture(PlayerRightTexture, false); break;
 				}
 				window->draw(*PlayerSprite);
-				drawPlayers(window);
 				if (snakes.size() <= 1) {
 					spawnSnakes(NUM_OF_ADDITIONAL_SNAKES);
 					setAntidotesPos(NUM_OF_ADDITIONAL_ANTIDOTES);
@@ -259,6 +299,7 @@ void renderingThread(RenderWindow* window)
 				displayTimeToDeath(window);
 			}
 		}
+
 		if (game_status == 0) {
 			showStartMenu(window);
 		}
@@ -267,6 +308,23 @@ void renderingThread(RenderWindow* window)
 		}
 		if (game_status == 3) {
 			showDeathScreen(window);
+		}
+		if (game_status == 4) {
+			int num = InputConnectBox(window, IPText, codeText, &inputType);
+			switch (num) {
+				case 1: 
+					mtx_coop_mode.lock();
+					coop_mode = 1;
+					cout << coop_mode << endl;
+					mtx_coop_mode.unlock();
+					break;
+				case 2: 
+					mtx_coop_mode.lock();
+					coop_mode = 2;
+					cout << coop_mode << endl;
+					mtx_coop_mode.unlock();
+					break;
+			}
 		}
 		window->display();
 	}
@@ -309,12 +367,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!AntidoteTexture.loadFromFile("Images/Antidote.png", false)) {}
 	if (!SkullTexture.loadFromFile("Images/Skull.png", false)) {}
 
-	Font font;
 	if (!font.openFromFile("Fonts/Arial.ttf")) {}
 
+	IPText = new Text(font);
+	codeText = new Text(font);
 	textScore = new Text(font);
 	textBestScore = new Text(font);
 	timeToDeath = new Text(font);
+	inviteText = new Text(font);
 
 	textScore->setCharacterSize(30);
 	textBestScore->setCharacterSize(30);
@@ -322,6 +382,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	textScore->setFillColor(Color::Black);
 	textBestScore->setFillColor(Color::Black);
 	timeToDeath->setFillColor(Color::Black);
+	IPText->setCharacterSize(34);
+	IPText->setFillColor(sf::Color::Black);
+	codeText->setCharacterSize(34);
+	codeText->setFillColor(sf::Color::Black);
+	inviteText->setCharacterSize(26);
+	inviteText->setFillColor(sf::Color::Black);
 
 	GrassSprite = new Sprite(GrassTexture);
 	RockSprite = new Sprite(RockLTexture);
@@ -333,6 +399,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SnakeTailSprite = new Sprite(SnakeTailTexture);
 	GroundSprite = new Sprite(GroundTexture);
 	StartButtonSprite = new Sprite(StartButtonTexture);
+	CoopButtonSprite = new Sprite(StartButtonTexture);
 	ExitButtonSprite = new Sprite(ExitButtonTexture);
 	ContinueButtonSprite = new Sprite(ContinueButtonTexture);
 	RestartButtonSprite = new Sprite(RestartButtonTexture);
@@ -341,9 +408,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	GameOverSprite = new Sprite(GameOverTexture);
 	AntidoteSprite = new Sprite(AntidoteTexture);
 	SkullSprite = new Sprite(SkullTexture);
+	SnakeBodyBendSprite = new Sprite(SnakeBodyBendTexture);
 
-
-	SnakeBodySprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
+	SnakeBodySprite->setOrigin({ OBJECT_SIZE / 2, 1.5f });
+	SnakeBodyBendSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
 	SnakeHeadSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
 	SnakeTailSprite->setOrigin({ OBJECT_SIZE / 2, OBJECT_SIZE / 2 });
 	PlayerSprite->setOrigin({ PLAYER_SIZEX / 2, PLAYER_SIZEY / 2 });
@@ -354,7 +422,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	while (window.isOpen())
 	{
-		while (const optional event = window.pollEvent())
+		while (optional event = window.pollEvent())
 		{
 			if (event->is<Event::Closed>())
 				window.close();
@@ -363,9 +431,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				SCREEN_RESY = window.getSize().y;
 				view.setSize({ SCREEN_RESX, SCREEN_RESY });
 			}
+			if (game_status == 4) {
+				switch (inputType) {
+				case 1:
+					processInputEvent(&event, IPText, &IPInput);
+					break;
+				case 2:
+					processInputEvent(&event, codeText, &codeInput);
+					break;
+				}
+			}
 		}
 	}
+	if (thread.joinable()) {
 	thread.join();
-	syncThread.request_stop();
+	}
+	if (connToServ.joinable()) {
+		connToServ.join();
+	}
+	if (syncThread.joinable()) {
+		syncThread.request_stop();
+	}
+	WSACleanup();
 	return 0;
 }

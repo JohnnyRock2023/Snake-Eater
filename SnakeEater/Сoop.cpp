@@ -2,14 +2,15 @@
 
 int clientSock;
 int playerID;
+int inviteCode;
 
-map<int, Vector2f> players = map<int, Vector2f>();
+map<int, Player> players = map<int, Player>();
 
 queue<Package*> *sendPackageQueue = new queue<Package*>();
 queue<Package*> *recvPackageQueue = new queue<Package*>();
 
 void createSendPackage() {
-	Package* pckg = new Package(game_status, score, bestScore, playerID, playerPosX, playerPosY, snakes, antidotes);
+	Package* pckg = new Package(game_status, score, bestScore, playerID, playerDirection, playerPosX, playerPosY, snakes, antidotes);
 	sendPackageQueue->push(pckg);
 }
 
@@ -82,18 +83,40 @@ void syncData(std::stop_token stoken) {
 }
 
 
-void createSock() {
+bool createSock(const char* ipAddress) {
 	WSADATA wsa;
 	WSAStartup(MAKEWORD(2, 2), &wsa);
-
 	clientSock = socket(AF_INET, SOCK_STREAM, 0);
+	fd_set set;
+	FD_ZERO(&set);
+	FD_SET(clientSock, &set);
+	timeval timeout{};
+	timeout.tv_sec = 2;
+	u_long mode = 1;
+	ioctlsocket(clientSock, FIONBIO, &mode);
 	sockaddr_in serverAddress;
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_port = htons(8080);
-	inet_pton(AF_INET, "192.168.1.101", &serverAddress.sin_addr);
-
+	inet_pton(AF_INET, ipAddress, &serverAddress.sin_addr);
 	connect(clientSock, (const sockaddr*)&serverAddress, sizeof(serverAddress));
-
+	int result = select(0, nullptr, &set, nullptr, &timeout);
+	mode = 0;
+	ioctlsocket(clientSock, FIONBIO, &mode);
+	if (result > 0) {
+		int error = 0;
+		int len = sizeof(int);
+		getsockopt(
+			clientSock,
+			SOL_SOCKET,
+			SO_ERROR,
+			(char*)&error,
+			&len
+		);
+		if (error) {
+			return false;
+		}
+	}
+	return true;
 }
 
 bool sendAll(SOCKET s, const void* data, int size) {
@@ -145,22 +168,74 @@ float recvFloat() {
 	return f;
 }
 
-void createServer() {
-	createSock();
-	sendObjects();
-	sendFloat(playerPosX);
-	sendFloat(playerPosY);
-	playerID = recvInt();
-	createSendPackage();
-	sendToServer(getSendPackage());
+void createServer(string * ipAddress) {
+	if (createSock(ipAddress->c_str())) {
+		restart();
+		mtx_game_status.lock();
+		sendInt(1);
+		sendObjects();
+		sendInt(playerDirection);
+		sendFloat(playerPosX);
+		sendFloat(playerPosY);
+		playerID = recvInt();
+		inviteCode = recvInt();
+		createSendPackage();
+		sendToServer(getSendPackage());
+		game_status = 1;
+		mtx_game_status.unlock();
+		mtx_coop_mode.lock();
+		coop_mode = 3;
+		mtx_coop_mode.unlock();
+		StopMenuMusic();
+		AudioTrack();
+	}
+	else {
+		closesocket(clientSock);
+		WSACleanup();
+		mtx_coop_mode.lock();
+		coop_mode = 0;
+		mtx_coop_mode.unlock();
+	}
 }
 
-void connectToServer() {
-	createSock();
-	sendFloat(playerPosX);
-	sendFloat(playerPosY);
-	playerID = recvInt();
-	recvObjects();
+void connectToServer(string * ipAddress, int code) {
+	if (createSock(ipAddress->c_str())) {
+		snakes.clear();
+		objects.clear();
+		antidotes.clear();
+		sendInt(2);
+		sendInt(code);
+		int status = recvInt();
+		if (!status) {
+			closesocket(clientSock);
+			WSACleanup();
+			mtx_coop_mode.lock();
+			coop_mode = 0;
+			mtx_coop_mode.unlock();
+			return;
+		}
+		sendInt(playerDirection);
+		sendFloat(playerPosX);
+		sendFloat(playerPosY);
+		playerID = recvInt();
+		inviteCode = recvInt();
+		recvObjects();
+		mtx_game_status.lock();
+		game_status = 1;
+		mtx_game_status.unlock();
+		mtx_coop_mode.lock();
+		coop_mode = 3;
+		mtx_coop_mode.unlock();
+		StopMenuMusic();
+		AudioTrack();
+	}
+	else {
+		closesocket(clientSock);
+		WSACleanup();
+		mtx_coop_mode.lock();
+		coop_mode = 0;
+		mtx_coop_mode.unlock();
+	}
 }
 
 void sendObjects() {
@@ -179,16 +254,18 @@ void sendToServer(Package* pckg) {
 	sendInt(pckg->score);
 	sendInt(pckg->bestScore);
 	sendInt(pckg->playerID);
+	sendInt(pckg->playerDirection);
 	sendFloat(pckg->playerPosX);
 	sendFloat(pckg->playerPosY);
-
 	if (playerID == 0) {
 		sendInt(snakes.size());
 		for (Snake snake : pckg->snakes) {
+			sendInt(snake.getLength());
 			sendInt(snake.getSize());
 			sendInt(snake.getDirect());
 			for (SnakeBody bodyPart : snake.getBody()) {
-				sendInt(bodyPart.bodyDirect);
+				sendInt(bodyPart.bodyDirect1);
+				sendInt(bodyPart.bodyDirect2);
 				sendFloat(bodyPart.pos.x);
 				sendFloat(bodyPart.pos.y);
 			}
@@ -238,23 +315,26 @@ Package* getFromServer() {
 	}
 	for (int i = 0; i < playersNum; i++) {
 		int id = recvInt();
+		int direct = recvInt();
 		float playersPosX = recvFloat();
 		float playersPosY = recvFloat();
-		pckg->players.insert({ id, {playersPosX, playersPosY} });
+		pckg->players.insert({ id, Player(direct, playersPosX, playersPosY)});
 	}
 	if (playerID != 0) {
 		int snakesNum = recvInt();
 		for (int i = 0; i < snakesNum; i++) {
+			int length = recvInt();
 			int snakeSize = recvInt();
 			int direct = recvInt();
 			vector<SnakeBody> body = vector<SnakeBody>();
 			for (int j = 0; j < snakeSize; j++) {
-				int bodyDirect = recvInt();
+				int bodyDirect1 = recvInt();
+				int bodyDirect2 = recvInt();
 				float posX = recvFloat();
 				float posY = recvFloat();
-				body.push_back(SnakeBody(bodyDirect, { posX, posY }));
+				body.push_back(SnakeBody(bodyDirect1, bodyDirect2, { posX, posY }));
 			}
-			pckg->snakes.push_back(Snake(snakeSize, direct, body));
+			pckg->snakes.push_back(Snake(length, direct, body));
 		}
 		int antidotesNum = recvInt();
 		for (int i = 0; i < antidotesNum; i++) {

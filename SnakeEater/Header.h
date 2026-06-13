@@ -44,7 +44,7 @@ extern float SCREEN_RESY;
 #define HIT_DELAY 500
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 90
-#define DEATH 1
+#define DEATH 15
 #define MIN_NUM_OF_ANTIDOTES 4
 #define MAX_NUM_OF_ANTIDOTES 6
 #define NUM_OF_ADDITIONAL_ANTIDOTES 2
@@ -62,8 +62,16 @@ extern bool isPoisoned;
 extern float poisonTimer;
 extern float pauseTimer;
 extern int playerID;
+extern int inviteCode;
 extern int clientSock;
-extern map<int, Vector2f> players;
+extern Font font;
+
+extern mutex mtx1;
+extern mutex mtx2;
+extern mutex mtx_game_status;
+extern mutex mtx_coop_mode;
+
+extern std::jthread syncThread;
 
 class Object {
 private:
@@ -86,11 +94,13 @@ public:
 
 class SnakeBody {
 public:
-	int bodyDirect;
+	int bodyDirect1;
+	int bodyDirect2;
 	Vector2f pos;
 
-	SnakeBody(int direct, Vector2f pos) {
-		this->bodyDirect = direct;
+	SnakeBody(int direct1, int direct2, Vector2f pos) {
+		this->bodyDirect1 = direct1;
+		this->bodyDirect2 = direct2;
 		this->pos = pos;
 	}
 };
@@ -98,13 +108,13 @@ public:
 class Snake {
 private:
 	int direction = 0;
-	int size;
+	int length;
 	vector<SnakeBody> body;
 
 public:
-	Snake(int size, int direction, vector<SnakeBody>& body)
+	Snake(int length, int direction, vector<SnakeBody>& body)
 	{
-		this->size = size;
+		this->length = length;
 		this->body = body;
 		this->direction = direction;
 	};
@@ -113,8 +123,11 @@ public:
 			body.pop_back();
 		}
 	};
+	int getLength() {
+		return length;
+	}
 	int getSize() {
-		return size;
+		return body.size();
 	}
 	int getDirect() {
 		return direction;
@@ -126,9 +139,50 @@ public:
 		return body;
 	}
 	void hitSnake() {
-		if (!body.empty()) {
-			body.pop_back();
-			size = (short)body.size();
+		int pxToDel = OBJECT_SIZE;
+		int Index;
+		if (length > 2) {
+			int avToDel = 0;
+			int currToDel = 0;
+			while (pxToDel > 0) {
+				Index = body.size() - 1;
+				switch (body[Index].bodyDirect1) {
+				case 0:
+					avToDel = body[Index].pos.y - body[Index - 1].pos.y; break;
+				case 1:
+					avToDel = body[Index - 1].pos.y - body[Index].pos.y; break;
+				case 2:
+					avToDel = body[Index].pos.x - body[Index - 1].pos.x; break;
+				case 3:
+					avToDel = body[Index - 1].pos.x - body[Index + 1].pos.x; break;
+				}
+				if (avToDel > 0 && avToDel < pxToDel) {
+					currToDel = avToDel;
+					pxToDel -= avToDel;
+					if (body.size() >= 3)
+						body[Index].bodyDirect1 = body[Index - 1].bodyDirect1;
+					    body[Index].bodyDirect2 = body[Index - 1].bodyDirect1;
+						body[Index].pos = body[Index - 1].pos;
+						body.erase(body.end() - 2);
+				}
+				else {
+					currToDel = pxToDel;
+					pxToDel = 0;
+				}
+				Index = body.size() - 1;
+				switch (body[Index].bodyDirect1) {
+				case 0:
+					body[Index].pos.y -= currToDel; break;
+				case 1:
+					body[Index].pos.y += currToDel; break;
+				case 2:
+					body[Index].pos.x -= currToDel; break;
+				case 3:
+					body[Index].pos.x += currToDel; break;
+				}
+
+			}
+			length -= 1;
 		}
 	}
 };
@@ -136,10 +190,14 @@ public:
 
 class Player {
 	public:
-	int id;
+	int direction;
 	Vector2f pos;
-	Player(int id, float posX, float posY) {
-		this->id = id;
+	Player() {
+		this->direction = 0;
+		this->pos = { 0, 0 };
+	}
+	Player(int direction, float posX, float posY) {
+		this->direction = direction;
 		this->pos = { posX, posY };
 	}
 };
@@ -150,17 +208,19 @@ public:
 	int score;
 	int bestScore;
 	int playerID;
+	int playerDirection;
 	float playerPosX;
 	float playerPosY;
 	vector<Snake> snakes;
 	vector<Vector2f> antidotes;
-	map<int, Vector2f> players;
+	map<int, Player> players;
 
 	Package() {
 		this->game_status = 0;
 		this->score = 0;
 		this->bestScore = 0;
 		this->playerID = 10;
+		this->playerDirection = 0;
 		this->playerPosX = 0;
 		this->playerPosY = 0;
 		this->snakes = vector<Snake>();
@@ -171,6 +231,7 @@ public:
 		int score,
 		int bestScore,
 		int playerID,
+		int playerDirection,
 		float playerPosX,
 		float playerPosY,
 		vector<Snake> snakes,
@@ -179,6 +240,7 @@ public:
 		this->score = score;
 		this->bestScore = bestScore;
 		this->playerID = playerID;
+		this->playerDirection = playerDirection;
 		this->playerPosX = playerPosX;
 		this->playerPosY = playerPosY;
 		this->snakes = vector<Snake>(snakes);
@@ -203,6 +265,7 @@ extern vector<Snake> snakes;
 extern vector<Vector2f> antidotes;
 extern vector<int> hittedSnakes;
 extern vector<Vector2f> usedAntidotes;
+extern map<int, Player> players;
 
 extern Sprite* GrassSprite;
 extern Sprite* RockSprite;
@@ -214,6 +277,7 @@ extern Sprite* SnakeHeadSprite;
 extern Sprite* SnakeTailSprite;
 extern Sprite* GroundSprite;
 extern Sprite* StartButtonSprite;
+extern Sprite* CoopButtonSprite;
 extern Sprite* ExitButtonSprite;
 extern Sprite* ContinueButtonSprite;
 extern Sprite* RestartButtonSprite;
@@ -222,8 +286,12 @@ extern Sprite* LogoSprite;
 extern Sprite* GameOverSprite;
 extern Sprite* AntidoteSprite;
 extern Sprite* SkullSprite;
+extern Sprite* SnakeBodyBendSprite;
 
 extern Texture PlayerFrontTexture;
+extern Texture PlayerBackTexture;
+extern Texture PlayerLeftTexture;
+extern Texture PlayerRightTexture;
 extern Texture RockLTexture;
 extern Texture RockSTexture;
 extern Texture BushLTexture;
@@ -275,9 +343,9 @@ void displayTimeToDeath(RenderWindow* window);
 void restart();
 void isTheBest();
 bool isNearPlayer(float posX, float posY);
-void createSock();
-void createServer();
-void connectToServer();
+bool createSock(const char* ipAddress);
+void createServer(string* ipAddress);
+void connectToServer(string* ipAddress, int code);
 void sendToServer(Package *pckg);
 Package* getFromServer();
 void sendObjects();
@@ -288,6 +356,8 @@ void syncData(std::stop_token stoken);
 void createSendPackage();
 void getRecvPackage();
 void drawPlayers(RenderWindow* window);
+int InputConnectBox(RenderWindow* window, Text* IP, Text* code, int* inputType);
+void processInputEvent(optional<Event>* event, Text* drawableText, string* str);
 
 //VikaK
 void handleZoom(View& view);

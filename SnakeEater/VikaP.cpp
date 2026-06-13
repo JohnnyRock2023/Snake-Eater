@@ -5,14 +5,11 @@ float posForButtonY = viewPosY - SCREEN_RESY / 2;
 float startButtonPosX = viewPosX - BUTTON_WIDTH / 2;
 float startButtonPosY = viewPosY + 20;
 
-float createServerButtonPosX = viewPosX + BUTTON_WIDTH;
-float createServerButtonPosY = viewPosY + 20;
-
-float connectServerButtonPosX = viewPosX + BUTTON_WIDTH;
-float connectServerButtonPosY = viewPosY +130;
+float coopButtonPosX = viewPosX - BUTTON_WIDTH/2;
+float coopButtonPosY = viewPosY + 130;
 
 float exitButtonPosX = viewPosX - BUTTON_WIDTH / 2;
-float exitButtonPosY = viewPosY + 130;
+float exitButtonPosY = viewPosY + 260;
 float pauseButtonX = viewPosX - BUTTON_WIDTH / 2;
 float continueButtonY = viewPosY - 100;
 float restartButtonY = viewPosY;
@@ -30,8 +27,10 @@ void showStartMenu(RenderWindow* window) {
 	posForButtonY = viewPosY - SCREEN_RESY / 2;
 	startButtonPosX = viewPosX - BUTTON_WIDTH / 2;
 	startButtonPosY = viewPosY + 20;
+	coopButtonPosX = viewPosX - BUTTON_WIDTH / 2;
+	coopButtonPosY = viewPosY + 130;
 	exitButtonPosX = viewPosX - BUTTON_WIDTH / 2;
-	exitButtonPosY = viewPosY + 130;
+	exitButtonPosY = viewPosY + 240;
 
 	StartButtonSprite->setPosition({ startButtonPosX, startButtonPosY });
 	ExitButtonSprite->setPosition({ exitButtonPosX, exitButtonPosY });
@@ -41,59 +40,44 @@ void showStartMenu(RenderWindow* window) {
 	window->draw(*StartButtonSprite);
 	window->draw(*ExitButtonSprite);
 
-	StartButtonSprite->setPosition({ createServerButtonPosX, createServerButtonPosY });
-	ExitButtonSprite->setPosition({ connectServerButtonPosX, connectServerButtonPosY });
-
-	window->draw(*StartButtonSprite);
-	window->draw(*ExitButtonSprite);
+	CoopButtonSprite->setPosition({ coopButtonPosX, coopButtonPosY });
+	window->draw(*CoopButtonSprite);
 
 
-	if (pauseTimer > 300 && Mouse::isButtonPressed(Mouse::Button::Left)) {
+	if (Mouse::isButtonPressed(Mouse::Button::Left)) {
 		Vector2i mousePos = Mouse::getPosition(*window);
 		// Натиск на кнопку старт
-		if (inRange(posForButtonX + mousePos.x, startButtonPosX, startButtonPosX + BUTTON_WIDTH) && 
+		if (pauseTimer > 300 && inRange(posForButtonX + mousePos.x, startButtonPosX, startButtonPosX + BUTTON_WIDTH) &&
 			inRange(posForButtonY + mousePos.y, startButtonPosY, startButtonPosY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
 			StopMenuMusic();
 			AudioTrack();
 			restart();
+			mtx_game_status.lock();
 			game_status = 1;
+			mtx_game_status.unlock();
+			mtx_coop_mode.lock();
 			coop_mode = 0;
+			mtx_coop_mode.unlock();
 			menuPl = false;
+			pauseTimer = 0;
 		}
 		// Натиск на кнопку виходу
-		if (inRange(posForButtonX + mousePos.x, exitButtonPosX, exitButtonPosX + BUTTON_WIDTH) && 
+		if (pauseTimer > 300 && inRange(posForButtonX + mousePos.x, exitButtonPosX, exitButtonPosX + BUTTON_WIDTH) &&
 			inRange(posForButtonY + mousePos.y, exitButtonPosY, exitButtonPosY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
 			window->close();
-			
 		}
 
-		if (inRange(posForButtonX + mousePos.x, createServerButtonPosX, createServerButtonPosX + BUTTON_WIDTH) &&
-			inRange(posForButtonY + mousePos.y, createServerButtonPosY, createServerButtonPosY + BUTTON_HEIGHT)) {
+		if (pauseTimer > 300 && inRange(posForButtonX + mousePos.x, coopButtonPosX, coopButtonPosX + BUTTON_WIDTH) &&
+			inRange(posForButtonY + mousePos.y, coopButtonPosY, coopButtonPosY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
-			game_status = 1;
-			coop_mode = 1;
-			StopMenuMusic();
-			AudioTrack();
-			restart();
+			mtx_game_status.lock();
+			game_status = 4;
+			mtx_game_status.unlock();
 			menuPl = false;
-
+			pauseTimer = 0;
 		}
-
-		if (inRange(posForButtonX + mousePos.x, connectServerButtonPosX, connectServerButtonPosX + BUTTON_WIDTH) &&
-			inRange(posForButtonY + mousePos.y, connectServerButtonPosY, connectServerButtonPosY + BUTTON_HEIGHT)) {
-			PlayButtonClickSound();
-			game_status = 1;
-			coop_mode = 2;
-			StopMenuMusic();
-			AudioTrack();
-			snakes.clear();
-			objects.clear();
-			antidotes.clear();
-			menuPl = false;
-		}
-
 	}
 }
 
@@ -119,7 +103,9 @@ void showPauseMenu(RenderWindow* window) {
 
 	if (pauseTimer > 300 && Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
 		restoreMusic();
+		mtx_game_status.lock();
 		game_status = 1;
+		mtx_game_status.unlock();
 		pauseTimer = 0;
 		poisonClock->restart();
 	}
@@ -134,23 +120,43 @@ void showPauseMenu(RenderWindow* window) {
 			PlayButtonClickSound();
 			restoreMusic();
 			poisonClock->restart();
+			mtx_game_status.lock();
 			game_status = 1;
+			mtx_game_status.unlock();
 		}
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, restartButtonY, restartButtonY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
 			restoreMusic();
-			restart();
+			mtx_game_status.lock();
 			game_status = 1;
+			mtx_game_status.unlock();
+			mtx_coop_mode.lock();
+			coop_mode = 0;
+			mtx_coop_mode.unlock();
+			if (syncThread.joinable()) {
+				syncThread.request_stop();
+			}
+			closesocket(clientSock);
+			restart();
 		}
 
 		if (inRange(mouseX, pauseButtonX, pauseButtonX + BUTTON_WIDTH) &&
 			inRange(mouseY, menuButtonY, menuButtonY + BUTTON_HEIGHT)) {
 			PlayButtonClickSound();
-			restart();
 			StopTimerSound();
+			if (syncThread.joinable()) {
+				syncThread.request_stop();
+			}
+			closesocket(clientSock);
+			restart();
+			mtx_game_status.lock();
 			game_status = 0;
+			mtx_game_status.unlock();
+			mtx_coop_mode.lock();
+			coop_mode = 0;
+			mtx_coop_mode.unlock();
 			pauseTimer = 0;
 		}
 	}
@@ -194,8 +200,17 @@ void showDeathScreen(RenderWindow* window) {
 			PlayButtonClickSound();
 			StopDeathMusic();
 			AudioTrack();
+			if (syncThread.joinable()) {
+				syncThread.request_stop();
+			}
+			closesocket(clientSock);
 			restart();
+			mtx_game_status.lock();
 			game_status = 1;
+			mtx_game_status.unlock();
+			mtx_coop_mode.lock();
+			coop_mode = 0;
+			mtx_coop_mode.unlock();
 			failMusic = false;
 		}
 
@@ -204,9 +219,18 @@ void showDeathScreen(RenderWindow* window) {
 			PlayButtonClickSound();
 			StopDeathMusic();
 			PlayMenuMusic();
-			restart();
 			StopTimerSound();
+			if (syncThread.joinable()) {
+				syncThread.request_stop();
+			}
+			closesocket(clientSock);
+			restart();
+			mtx_game_status.lock();
 			game_status = 0;
+			mtx_game_status.unlock();
+			mtx_coop_mode.lock();
+			coop_mode = 0;
+			mtx_coop_mode.unlock();
 			pauseTimer = 0;
 			failMusic = false;
 		}

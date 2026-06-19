@@ -1,7 +1,7 @@
 #include "Header.h"
 
 int clientSock;
-int playerID;
+int playerID = -1;
 int inviteCode;
 
 map<int, Player> players = map<int, Player>();
@@ -31,12 +31,14 @@ void getRecvPackage() {
 	if (!recvPackageQueue->empty()) {
 		Package* pckg = recvPackageQueue->front();
 		recvPackageQueue->pop();
-		if (playerID) {
+		if (playerID > 0) {
 			snakes.clear();
 			snakes = pckg->snakes;
 			antidotes.clear();
 			antidotes = pckg->antidotes;
+			mtx_game_status.lock();
 			game_status = pckg->game_status;
+			mtx_game_status.unlock();
 		}
 		if (!playerID) {
 			int* indexes = new int[usedAntidotes.size()];

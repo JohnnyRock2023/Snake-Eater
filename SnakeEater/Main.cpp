@@ -158,9 +158,12 @@ void renderingThread(RenderWindow* window)
 		pauseClock.restart();
 		pauseTimer += pauseTime;
 
-		if (game_status == 1 && pauseTimer > 300 && Keyboard::isKeyPressed(Keyboard::Key::Escape)) {
-			game_status = 2;
-			pauseTimer = 0;
+		if ((game_status == 1 && pauseTimer > 300 && Keyboard::isKeyPressed(Keyboard::Key::Escape)) && (!coop_mode || !playerID)) {
+				game_status = 2;
+				pauseTimer = 0;
+		}
+		if (coop_mode == 4) {
+			getRecvPackage();
 		}
 		if (game_status == 1) {
 			float time = clock.getElapsedTime().asMilliseconds();
@@ -223,15 +226,15 @@ void renderingThread(RenderWindow* window)
 			}
 
 			if (poisonTimer > DEATH) {
-				if (coop_mode == 0 || playerID == 0) {
-					game_status = 3;
-				}
-				if (coop_mode || playerID != 0) {
+				if (coop_mode || playerID > 0) {
 					game_status = 0;
 					coop_mode = 0;
 					syncThread.request_stop();
 					closesocket(clientSock);
 					restart();
+				}
+				else {
+					game_status = 3;
 				}
 			}
 		}
@@ -246,9 +249,6 @@ void renderingThread(RenderWindow* window)
 				moveSnakes();
 			}
 			createServerThread();
-			if (coop_mode == 4) {
-				getRecvPackage();
-			}
 			handleZoom(view);
 			if (viewPosY - (SCREEN_RESY / 2) > 0 && viewPosY + (SCREEN_RESY / 2) < MAP_SIZEY) {
 				viewPosY += (playerPosY - viewPosY) * 0.15f;

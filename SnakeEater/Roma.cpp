@@ -225,20 +225,22 @@ void drawSnakes(RenderWindow* window) {
 			}
 
 			for (int k = 5; k < count - 3; k++) {
-				switch (direct)
-				{
-				case 0:
-					SnakeBodySprite->setPosition({ snakes[i].getBody()[j].pos.x, snakes[i].getBody()[j].pos.y + k * 3 });
-					break;
-				case 1:
-					SnakeBodySprite->setPosition({ snakes[i].getBody()[j].pos.x, snakes[i].getBody()[j].pos.y - k * 3 });
-					break;
-				case 2:
-					SnakeBodySprite->setPosition({ snakes[i].getBody()[j].pos.x + k * 3, snakes[i].getBody()[j].pos.y });
-					break;
-				case 3:
-					SnakeBodySprite->setPosition({ snakes[i].getBody()[j].pos.x - k * 3, snakes[i].getBody()[j].pos.y });
-					break;
+				if (i < snakes.size() && j < snakes[i].getSize()) {
+					switch (direct)
+					{
+					case 0:
+						SnakeBodySprite->setPosition({ snakes[i].getBody()[j].pos.x, snakes[i].getBody()[j].pos.y + k * 3 });
+						break;
+					case 1:
+						SnakeBodySprite->setPosition({ snakes[i].getBody()[j].pos.x, snakes[i].getBody()[j].pos.y - k * 3 });
+						break;
+					case 2:
+						SnakeBodySprite->setPosition({ snakes[i].getBody()[j].pos.x + k * 3, snakes[i].getBody()[j].pos.y });
+						break;
+					case 3:
+						SnakeBodySprite->setPosition({ snakes[i].getBody()[j].pos.x - k * 3, snakes[i].getBody()[j].pos.y });
+						break;
+					}
 				}
 				window->draw(*SnakeBodySprite);
 			}
